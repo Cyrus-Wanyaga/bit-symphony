@@ -4,9 +4,8 @@
  * @version 1.0
  */
 
-package com.techsol.web;
+package com.techsol.web.http;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,12 +22,12 @@ import java.util.Map;
  */
 public class HTTPRequest {
     private final String method;
-    private final URL url;
+    private final String url;
     private final Map<String, String> headers;
     private int contentLength;
     private byte[] body;
 
-    public HTTPRequest(String method, URL url) {
+    public HTTPRequest(String method, String url) {
         this.method = method;
         this.url = url;
         this.headers = new HashMap<>();
@@ -38,7 +37,7 @@ public class HTTPRequest {
         return method;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
     }
 
@@ -72,6 +71,4 @@ public class HTTPRequest {
     public String toString() {
         return "HTTPRequest [method=" + method + ", url=" + url + ", contentLength=" + contentLength + "]";
     }
-
-    
 }

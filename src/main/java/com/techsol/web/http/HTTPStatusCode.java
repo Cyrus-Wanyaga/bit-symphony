@@ -1,4 +1,4 @@
-package com.techsol.web;
+package com.techsol.web.http;
 
 public enum HTTPStatusCode {
     OK(200, "OK"),

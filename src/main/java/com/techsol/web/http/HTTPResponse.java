@@ -1,7 +1,10 @@
-package com.techsol.web;
+package com.techsol.web.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class HTTPResponse {
@@ -11,8 +14,10 @@ public class HTTPResponse {
     private byte[] body;
     private boolean ok;
     private OutputStream outputStream;
+    private SocketChannel socketChannel;
 
-    public HTTPResponse(){}
+    public HTTPResponse() {
+    }
 
     public HTTPResponse(int statusCode, String statusLine, Map<String, String> headers, byte[] body, boolean ok) {
         this.statusCode = statusCode;
@@ -70,6 +75,34 @@ public class HTTPResponse {
         this.outputStream = outputStream;
     }
 
-    public void send() throws IOException {
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
     }
+
+    public void setSocketChannel(SocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
+    }
+
+    public void send() throws IOException {
+        StringBuilder builder = new StringBuilder();
+        builder.append(statusLine).append("\r\n");
+        this.headers.forEach((k, v) -> {
+            builder.append(k).append(": ").append(v).append("\r\n");
+        });
+        builder.append("\r\n");
+        System.out.println(builder.toString());
+        ByteBuffer headerBuffer = StandardCharsets.UTF_8.encode(builder.toString());
+        while (headerBuffer.hasRemaining()) {
+            this.socketChannel.write(headerBuffer);
+        }
+
+        if (body != null && body.length > 0) {
+            System.out.println("Body is not null");
+            ByteBuffer bodyBuffer = ByteBuffer.wrap(body);
+            while(bodyBuffer.hasRemaining()){
+                socketChannel.write(bodyBuffer);
+            }
+        }
+    }
+
 }

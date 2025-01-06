@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>{{ websiteTitle }}</title>
+    <style>
+        .user-list {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .user-item {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-list">
+        {% for user in users %}
+            <div class="user-item">
+                <strong>{{ user.name }}</strong>
+                <div>Email: {{ user.email }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <script src="/index.js"/>
+</body>
+</html>

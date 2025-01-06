@@ -1,9 +1,15 @@
 package com.techsol;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import com.techsol.app.WebServer;
 import com.techsol.database.DatabaseManager;
 import com.techsol.database.dao.ConfigDao;
+import com.techsol.web.templateengine.PebbleEngineProvider;
+
+import io.pebbletemplates.pebble.PebbleEngine;
 
 public class Main {
 
@@ -33,5 +39,16 @@ public class Main {
             return;
         }
 
+        System.out.println("Configs: " + configs.toString());
+
+        PebbleEngine pebbleEngine = new PebbleEngineProvider().getPebbleEngine();
+        if (pebbleEngine != null) {
+            System.out.println("Initialized Pebble Template Engine");
+        }
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            WebServer webServer = new WebServer();
+        });
     }
 }

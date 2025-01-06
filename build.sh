@@ -1,5 +1,59 @@
 #!/bin/bash
 
-C:/Users/cgithogori/softwares/java/jdk-17.0.12/bin/javac -d bin -cp "lib/*" $(find src/main/java -name "*.java")
+# Function to check if Node.js is installed
+check_node() {
+    if command -v node >/dev/null 2>&1; then
+        node_version=$(node --version)
+        echo "Node.js is installed (${node_version})"
+        return 0
+    else
+        echo "Node.js is not installed"
+        return 1
+    fi
+}
 
-C:/Users/cgithogori/softwares/java/jdk-17.0.12/bin/java -cp "bin;lib/*;src/main/resources" com.techsol.Main
+# Function to check if chokidar is installed
+check_chokidar() {
+    if npm list chokidar >/dev/null 2>&1; then
+        return 0
+    else
+        echo "Installing chokidar..."
+        npm install chokidar
+        return $?
+    fi
+}
+
+compile_java() {
+    echo "Compiling Java classes..."
+    javac -d bin-annotations -cp "lib/*" src/main/java/com/techsol/web/annotations/HTTPPath.java
+    javac -d bin-processor -cp "lib/*:bin-annotations" src/main/java/com/techsol/web/annotations/HTTPPathProcessor.java
+    javac -d bin -cp "bin-processor:bin-annotations:lib/*" -processor com.techsol.web.annotations.HTTPPathProcessor $(find src/main/java -name "*.java")
+}
+
+compile_java
+
+if [[ "${DEV_MODE}" == "true" ]] || [[ "$1" == "--dev" ]]; then
+    echo "Development mode detected"
+    
+    # Check for Node.js and chokidar
+    if check_node && check_chokidar; then
+        echo "Starting Node.js file watcher..."
+        # Start Node.js watcher in background
+        node filewatcher.js "${HTML_DIR}" "${PEB_DIR}" &
+        NODE_PID=$!
+        
+        # Start Java application
+        java -Ddev.mode=true -cp "bin:lib/*:src/main/resources" com.techsol.Main
+        
+        # Clean up Node.js process on exit
+        kill $NODE_PID
+    else
+        echo "Falling back to Java implementation..."
+        java -Ddev.mode=true -cp "bin:lib/*:src/main/resources" com.techsol.Main
+    fi
+else
+    # Production mode - use Java implementation
+    java -cp "bin:lib/*:src/main/resources" com.techsol.Main
+fi
+
+# java -Ddev.mode=true -cp "bin:lib/*:src/main/resources" com.techsol.Main

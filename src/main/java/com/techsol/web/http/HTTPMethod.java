@@ -1,4 +1,4 @@
-package com.techsol.web;
+package com.techsol.web.http;
 
 public enum HTTPMethod {
     // Only retrieves data

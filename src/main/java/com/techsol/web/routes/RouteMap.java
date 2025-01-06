@@ -21,6 +21,7 @@ public class RouteMap {
         if (routeMap.containsKey(path)) {
             return false;
         }
+        
         routeMap.put(path, handler);
         return true;
     }

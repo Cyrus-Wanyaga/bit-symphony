@@ -1,3 +1,18 @@
-bin
+bin*
 
 *.db
+
+index.html
+
+bit-symphony.iml
+
+.idea
+
+.vscode
+
+.DS_Store
+
+node_modules/
+
+src/main/resources/site/templates
+
