@@ -26,14 +26,14 @@ import com.techsol.web.http.HTTPRequest;
 import com.techsol.web.http.HTTPResponse;
 import com.techsol.web.routes.RouteRegistry;
 import com.techsol.web.ws.WebSocketHandlerProvider;
+import com.techsol.web.ws.WebSocketHandlers;
 import com.techsol.web.ws.WebsocketHandler;
 
 public class WebServer {
     private static final int PORT = 8086;
     private static final ExecutorService threadPool = Executors
             .newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private static Map<SocketChannel, WebsocketHandler> webSocketHandlers = new ConcurrentHashMap<>();
-
+    
     public WebServer() {
         RouteMapper.mapDefaultRoutes();
 
@@ -62,8 +62,8 @@ public class WebServer {
                         clientChannel.register(selector, SelectionKey.OP_READ);
                     } else if (key.isReadable()) {
                         SocketChannel clientChannel = (SocketChannel) key.channel();
-                        key.cancel();
-                        handleRequest(clientChannel);
+                        // key.cancel();
+                        handleRequest(clientChannel, key);
                     }
                 }
             }
@@ -72,7 +72,7 @@ public class WebServer {
         }
     }
 
-    private static void handleRequest(SocketChannel client) throws IOException {
+    private static void handleRequest(SocketChannel client, SelectionKey key) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(8192);
         StringBuilder requestBuilder = new StringBuilder();
 
@@ -85,6 +85,7 @@ public class WebServer {
             }
 
             if (bytesRead == -1) {
+                key.cancel();
                 client.close();
                 return;
             }
@@ -95,14 +96,15 @@ public class WebServer {
             }
 
             System.out.println("Client channel : " + client);
-            System.out.println("WebSocket handlers: " + webSocketHandlers.toString());
+            System.out.println("WebSocket handlers: " + WebSocketHandlers.getWebSocketHandlers().toString());
 
             if (isWebSocketHandshake(requestString)) {
                 HTTPRequest request = parseRequest(requestString);
                 handleWebSocketHandshake(client, request);
-            } else if (webSocketHandlers.containsKey(client)) {
+            } else if (WebSocketHandlers.getWebSocketHandlers().containsKey(client)) {
                 handleWebSocketRequest(client, buffer);
             } else {
+                key.cancel();
                 threadPool.submit(() -> {
                     try {
                         HTTPRequest request = parseRequest(requestString);
@@ -110,10 +112,6 @@ public class WebServer {
                         response.setSocketChannel(client);
                         System.out.println("Request: " + request.toString());
 
-                        // HTTPHandler handler =
-                        // RouteMap.getRouteMap().get(request.getUrl().toString());
-
-                        // handler.handle(request, response);
                         BiConsumer<HTTPRequest, HTTPResponse> handler = RouteRegistry.ROUTES.get(request.getUrl());
                         if (handler != null) {
                             handler.accept(request, response);
@@ -190,7 +188,7 @@ public class WebServer {
         WebsocketHandler handler = WebSocketHandlerProvider.createWebSocketHandlerForPath(request.getUrl(),
                 clientChannel, request.getHeaders().get("Sec-WebSocket-Protocol"));
         if (handler != null) {
-            webSocketHandlers.put(clientChannel, handler);
+            WebSocketHandlers.addWebSocketHandler(clientChannel, handler);
             handler.onOpen();
             System.out.println("Websocket handshake complete: " + clientChannel.getRemoteAddress());
         } else {
@@ -211,8 +209,9 @@ public class WebServer {
     }
 
     private static void handleWebSocketRequest(SocketChannel clientChannel, ByteBuffer buffer) {
-        WebsocketHandler handler = webSocketHandlers.get(clientChannel);
+        WebsocketHandler handler = WebSocketHandlers.getWebSocketHandlers().get(clientChannel);
         if (handler != null) {
+            System.out.println(handler.getClass().getName());
             handler.onMessage(buffer);
         }
     }
