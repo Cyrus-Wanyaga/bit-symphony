@@ -2,6 +2,8 @@
 const chokidar = require('chokidar');
 const path = require('path');
 const fs = require('fs/promises');
+const WebSocket = require('ws');
+let ws;
 
 // Get directories from command line arguments
 const HTML_DIR = './src/main/resources/site/templates-dev';
@@ -10,6 +12,22 @@ const PEB_DIR = './src/main/resources/site/templates';
 if (!HTML_DIR || !PEB_DIR) {
     console.error('Usage: node filewatcher.js <HTML_DIR> <PEB_DIR>');
     process.exit(1);
+}
+
+const wsConnect = async () => {
+    ws = new WebSocket('ws://localhost:8086/hmr', ['hmr']);
+    ws.onopen = () => {
+        console.log('WebSocket connection opened');
+    };
+    ws.onmessage = (event) => {
+        console.log('Node JS received message ' + event.data);
+    };
+    ws.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+    ws.onerror = (error) => {
+        console.error(`WebSocket error: ${JSON.stringify(error)}`);
+    }
 }
 
 // Initialize watcher
@@ -59,7 +77,11 @@ async function handleFile(filePath, eventType) {
         } else {
             await fs.copyFile(filePath, targetPath);
         }
-        console.log(`Processed: ${targetPath.replace("html", ".peb")}`);
+
+        if (ws) {
+            ws.send('reload');
+        }
+        console.log(`Processed: ${targetPath.replace(".html", ".peb")}`);
     } catch (err) {
         console.error(`Error processing file ${filePath}: ${err}`);
     }
@@ -73,3 +95,5 @@ watcher
     .on('error', error => console.error(`Watcher error: ${error}`));
 
 console.log(`Watching ${HTML_DIR} for changes...`);
+
+wsConnect();

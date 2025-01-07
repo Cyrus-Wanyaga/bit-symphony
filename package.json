@@ -4,6 +4,8 @@
     "description": "File watcher for HTML directory",
     "main": "filewatcher.js",
     "dependencies": {
-        "chokidar": "^4.0.3"
+        "chokidar": "^4.0.3",
+        "file-watcher": "file:",
+        "ws": "^8.18.0"
     }
 }
