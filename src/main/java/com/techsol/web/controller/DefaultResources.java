@@ -85,7 +85,7 @@ public class DefaultResources {
             if (is != null) {
                 byte[] content = is.readAllBytes();
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "image/jpg,image/jpeg,image/svg+xml");
+                headers.put("Content-Type", "image/*");
                 headers.put("Content-Length", String.valueOf(content.length));
                 headers.put("Cache-Control", "public, max-age=31536000");
 
