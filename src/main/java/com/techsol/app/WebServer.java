@@ -97,44 +97,44 @@ public class WebServer {
             if (isWebSocketHandshake(requestString)) {
                 HTTPRequest request = parseRequest(requestString);
                 handleWebSocketHandshake(client, request);
-            }
+            } else {
+                threadPool.submit(() -> {
+                    try {
+                        HTTPRequest request = parseRequest(requestString);
+                        HTTPResponse response = new HTTPResponse();
+                        response.setSocketChannel(client);
+                        System.out.println("Request: " + request.toString());
 
-            threadPool.submit(() -> {
-                try {
-                    HTTPRequest request = parseRequest(requestString);
-                    HTTPResponse response = new HTTPResponse();
-                    response.setSocketChannel(client);
-                    System.out.println("Request: " + request.toString());
+                        // HTTPHandler handler =
+                        // RouteMap.getRouteMap().get(request.getUrl().toString());
 
-                    // HTTPHandler handler =
-                    // RouteMap.getRouteMap().get(request.getUrl().toString());
-
-                    // handler.handle(request, response);
-                    BiConsumer<HTTPRequest, HTTPResponse> handler = RouteRegistry.ROUTES.get(request.getUrl());
-                    if (handler != null) {
-                        handler.accept(request, response);
-                    } else {
-                        handler = RouteRegistry.ROUTES.get("/**");
+                        // handler.handle(request, response);
+                        BiConsumer<HTTPRequest, HTTPResponse> handler = RouteRegistry.ROUTES.get(request.getUrl());
                         if (handler != null) {
                             handler.accept(request, response);
+                        } else {
+                            handler = RouteRegistry.ROUTES.get("/**");
+                            if (handler != null) {
+                                handler.accept(request, response);
+                            }
                         }
-                    }
 
-                    synchronized (client) {
-                        if (client.isOpen()) {
-                            response.send();
+                        synchronized (client) {
+                            if (client.isOpen()) {
+                                response.send();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            client.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+                });
+            }
         } catch (IOException e) {
             if (e instanceof SocketException) {
                 System.err.println("Client connection reset: " + e.getMessage());
@@ -178,10 +178,12 @@ public class WebServer {
         String response = "HTTP/1.1 101 Switching Protocols\r\n" +
                 "Upgrade: websocket\r\n" +
                 "Connection: Upgrade\r\n" +
+                "Sec-WebSocket-Protocol: " + request.getHeaders().get("Sec-WebSocket-Protocol") + "\r\n" + 
                 "Sec-WebSocket-Accept: " + acceptKey + "\r\n\r\n";
 
         clientChannel.write(ByteBuffer.wrap(response.getBytes(StandardCharsets.UTF_8)));
-        WebsocketHandler handler = WebSocketHandlerProvider.createWebSocketHandlerForPath(request.getUrl(), clientChannel, request.getHeaders().get("Sec-WebSocket-Protocol"));
+        WebsocketHandler handler = WebSocketHandlerProvider.createWebSocketHandlerForPath(request.getUrl(),
+                clientChannel, request.getHeaders().get("Sec-WebSocket-Protocol"));
         if (handler != null) {
             webSocketHandlers.put(clientChannel, handler);
             handler.onOpen();
