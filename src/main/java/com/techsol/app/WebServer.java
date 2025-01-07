@@ -94,9 +94,14 @@ public class WebServer {
                 return;
             }
 
+            System.out.println("Client channel : " + client);
+            System.out.println("WebSocket handlers: " + webSocketHandlers.toString());
+
             if (isWebSocketHandshake(requestString)) {
                 HTTPRequest request = parseRequest(requestString);
                 handleWebSocketHandshake(client, request);
+            } else if (webSocketHandlers.containsKey(client)) {
+                handleWebSocketRequest(client, buffer);
             } else {
                 threadPool.submit(() -> {
                     try {
@@ -202,6 +207,13 @@ public class WebServer {
             return Base64.getEncoder().encodeToString(hash);
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate Sec-WebSocket-Accept key", e);
+        }
+    }
+
+    private static void handleWebSocketRequest(SocketChannel clientChannel, ByteBuffer buffer) {
+        WebsocketHandler handler = webSocketHandlers.get(clientChannel);
+        if (handler != null) {
+            handler.onMessage(buffer);
         }
     }
 }
