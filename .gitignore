@@ -2,8 +2,6 @@ bin*
 
 *.db
 
-index.html
-
 bit-symphony.iml
 
 .idea
