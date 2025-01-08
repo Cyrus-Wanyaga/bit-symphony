@@ -23,6 +23,17 @@ check_chokidar() {
     fi
 }
 
+# Function to check if ws is installed
+check_ws() {
+    if npm list ws >/dev/null 2>&1; then
+        return 0
+    else
+        echo "Installing ws..."
+        npm install ws
+        return $?
+    fi
+}
+
 compile_java() {
     echo "Compiling Java classes..."
     javac -d bin-annotations -cp "lib/*" src/main/java/com/techsol/web/annotations/HTTPPath.java
@@ -34,19 +45,28 @@ compile_java
 
 if [[ "${DEV_MODE}" == "true" ]] || [[ "$1" == "--dev" ]]; then
     echo "Development mode detected"
-    
+
     # Check for Node.js and chokidar
-    if check_node && check_chokidar; then
+    if check_node && check_chokidar && check_ws; then
+        # Start Java application
+        java -Ddev.mode=true -cp "bin:lib/*:src/main/resources" com.techsol.Main &
+        JAVA_PID=$!
+
+        echo $JAVA_PID
+        sleep 2
+
         echo "Starting Node.js file watcher..."
         # Start Node.js watcher in background
         node filewatcher.js "${HTML_DIR}" "${PEB_DIR}" &
         NODE_PID=$!
-        
-        # Start Java application
-        java -Ddev.mode=true -cp "bin:lib/*:src/main/resources" com.techsol.Main
-        
-        # Clean up Node.js process on exit
-        kill $NODE_PID
+
+        trap "echo 'Shutting down processes...'; kill $JAVA_PID $NODE_PID; exit" SIGINT SIGTERM
+
+        # Wait for either process to exit
+        wait $JAVA_PID $NODE_PID
+
+        # Clean up any remaining processes
+        kill $JAVA_PID $NODE_PID 2>/dev/null
     else
         echo "Falling back to Java implementation..."
         java -Ddev.mode=true -cp "bin:lib/*:src/main/resources" com.techsol.Main
