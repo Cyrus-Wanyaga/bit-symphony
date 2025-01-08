@@ -28,7 +28,6 @@ public class MainPage {
                 .getTemplate(Constants.TEMPLATES_PATH + "main"
                         + Constants.FILE_SEPARATOR + "main.peb");
                         
-
         Map<String, String> configs = ConfigDao.getConfig();
 
         if (configs == null) {
@@ -37,14 +36,8 @@ public class MainPage {
             System.out.println("Configs are : " + configs.toString());
         }
 
-        JSONObject configsObject = new JSONObject();
-
-        for (Map.Entry<String, String> entry : configs.entrySet()) {
-            configsObject.put(entry.getKey(), entry.getValue());
-        }
-
         Map<String, Object> context = new HashMap<>();
-        context.put("configs", configsObject);
+        context.put("configs", configs);
 
         Writer writer = new StringWriter();
         template.evaluate(writer, context);

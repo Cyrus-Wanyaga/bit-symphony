@@ -61,16 +61,15 @@
         <div class="line"></div>
         <div class="line"></div>
     </div>
-    <p>{{ configs }}</p>
-    {% if configs.initial_run == "false" %}
+    {% if configs.initial_run == "true" %}
         <div class="form-area">
-            <h1 style="font-weight: bold;letter-spacing: 5px;">Let's ndu this</h1>
+            <h1 style="font-weight: bold;letter-spacing: 5px;">Welcome</h1>
             <p>Username</p>
             <input type="text" placeholder="" tabindex="1"></input>
             <button type="button">Continue</button>
         </div>
     {% else %}
-        <div>Wow</div>
+        <div>Welcome Back</div>
     {% endif %}
 </div>
 {% endblock %}
