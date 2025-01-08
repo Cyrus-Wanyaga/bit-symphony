@@ -182,6 +182,7 @@ public class WebServer {
                 "Upgrade: websocket\r\n" +
                 "Connection: Upgrade\r\n" +
                 "Sec-WebSocket-Protocol: " + request.getHeaders().get("Sec-WebSocket-Protocol") + "\r\n" + 
+                "Access-Control-Allow-Origin: * \r\n" +
                 "Sec-WebSocket-Accept: " + acceptKey + "\r\n\r\n";
 
         clientChannel.write(ByteBuffer.wrap(response.getBytes(StandardCharsets.UTF_8)));
