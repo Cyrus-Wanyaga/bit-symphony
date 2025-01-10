@@ -41,7 +41,7 @@ public class MimeTypes {
         mimeTypes.put(".png", "image/png");
         mimeTypes.put(".pdf", "application/pdf");
         mimeTypes.put(".php", "application/x-httpd-php");
-        mimeTypes.put(".xml", "application/xml||text/xml");
+        mimeTypes.put(".xml", "application/xml,text/xml");
     }
 
     public static String getMimeType(String path) {
