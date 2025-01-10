@@ -14,14 +14,11 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
-import com.techsol.web.handlers.HTTPHandler;
 import com.techsol.web.http.HTTPRequest;
 import com.techsol.web.http.HTTPResponse;
 import com.techsol.web.routes.RouteRegistry;
@@ -33,10 +30,8 @@ public class WebServer {
     private static final int PORT = 8086;
     private static final ExecutorService threadPool = Executors
             .newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    
-    public WebServer() {
-        RouteMapper.mapDefaultRoutes();
 
+    public WebServer() {
         try (Selector selector = Selector.open();
                 ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
             serverChannel.bind(new InetSocketAddress(PORT));
@@ -62,7 +57,6 @@ public class WebServer {
                         clientChannel.register(selector, SelectionKey.OP_READ);
                     } else if (key.isReadable()) {
                         SocketChannel clientChannel = (SocketChannel) key.channel();
-                        // key.cancel();
                         handleRequest(clientChannel, key);
                     }
                 }
@@ -72,6 +66,13 @@ public class WebServer {
         }
     }
 
+    /**
+     * Handles incoming HTTP request from the given client channel.
+     *
+     * @param client the SocketChannel associated with the client
+     * @param key    the SelectionKey associated with the client
+     * @throws IOException if an I/O error occurs during request handling
+     */
     private static void handleRequest(SocketChannel client, SelectionKey key) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(8192);
         StringBuilder requestBuilder = new StringBuilder();
@@ -95,9 +96,6 @@ public class WebServer {
                 return;
             }
 
-            System.out.println("Client channel : " + client);
-            System.out.println("WebSocket handlers: " + WebSocketHandlers.getWebSocketHandlers().toString());
-
             if (isWebSocketHandshake(requestString)) {
                 HTTPRequest request = parseRequest(requestString);
                 handleWebSocketHandshake(client, request);
@@ -105,6 +103,7 @@ public class WebServer {
                 handleWebSocketRequest(client, buffer);
             } else {
                 key.cancel();
+
                 threadPool.submit(() -> {
                     try {
                         HTTPRequest request = parseRequest(requestString);
@@ -148,6 +147,13 @@ public class WebServer {
         }
     }
 
+    /**
+     * Parses a HTTP request string into an instance of {@link HTTPRequest}.
+     * 
+     * @param requestString the HTTP request string
+     * @return the parsed HTTP request
+     * @throws MalformedURLException if the request line is malformed
+     */
     private static HTTPRequest parseRequest(String requestString) throws MalformedURLException {
         String[] lines = requestString.split("\r\n");
         String[] requestLineParts = lines[0].split(" ");
@@ -170,10 +176,25 @@ public class WebServer {
         return request;
     }
 
+    /**
+     * Checks if the given request string is a WebSocket handshake request.
+     *
+     * @param request the HTTP request string
+     * @return true if the request is a WebSocket handshake request, false otherwise
+     */
     private static boolean isWebSocketHandshake(String request) {
         return request.contains("Connection: Upgrade") && request.contains("Upgrade: websocket");
     }
 
+    /**
+     * Handles a WebSocket handshake request.
+     *
+     * @param clientChannel the SocketChannel object that is used to send a response
+     *                      to the client
+     * @param request       the HTTP request object containing the request headers
+     *                      and WebSocket protocol
+     * @throws IOException if an I/O error occurs during response write
+     */
     private static void handleWebSocketHandshake(SocketChannel clientChannel, HTTPRequest request) throws IOException {
         String webSocketKey = request.getHeaders().get("Sec-WebSocket-Key");
         String acceptKey = generateWebSocketAcceptKey(webSocketKey);
@@ -181,7 +202,7 @@ public class WebServer {
         String response = "HTTP/1.1 101 Switching Protocols\r\n" +
                 "Upgrade: websocket\r\n" +
                 "Connection: Upgrade\r\n" +
-                "Sec-WebSocket-Protocol: " + request.getHeaders().get("Sec-WebSocket-Protocol") + "\r\n" + 
+                "Sec-WebSocket-Protocol: " + request.getHeaders().get("Sec-WebSocket-Protocol") + "\r\n" +
                 "Access-Control-Allow-Origin: * \r\n" +
                 "Sec-WebSocket-Accept: " + acceptKey + "\r\n\r\n";
 
@@ -198,6 +219,19 @@ public class WebServer {
         }
     }
 
+    /**
+     * Generates the Sec-WebSocket-Accept key required for the WebSocket handshake
+     * by
+     * taking the given key and concatenating it with the magic string
+     * "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+     * computing the SHA-1 hash of the resulting string, and then base64-encoding
+     * it.
+     *
+     * @param key the client's Sec-WebSocket-Key header
+     * @return the base64-encoded SHA-1 hash of the given key concatenated with the
+     *         magic string
+     * @throws RuntimeException if there is an error generating the hash
+     */
     private static String generateWebSocketAcceptKey(String key) {
         try {
             String acceptSeed = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
@@ -209,6 +243,14 @@ public class WebServer {
         }
     }
 
+    /**
+     * Handles incoming WebSocket requests by delegating the received message
+     * to the appropriate WebsocketHandler instance associated with the given
+     * client channel.
+     *
+     * @param clientChannel the SocketChannel associated with the WebSocket client
+     * @param buffer        the ByteBuffer containing the incoming WebSocket message
+     */
     private static void handleWebSocketRequest(SocketChannel clientChannel, ByteBuffer buffer) {
         WebsocketHandler handler = WebSocketHandlers.getWebSocketHandlers().get(clientChannel);
         if (handler != null) {
