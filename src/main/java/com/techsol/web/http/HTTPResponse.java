@@ -1,11 +1,13 @@
 package com.techsol.web.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 public class HTTPResponse {
     private int statusCode;
@@ -13,6 +15,7 @@ public class HTTPResponse {
     private Map<String, String> headers;
     private byte[] body;
     private boolean ok;
+    private boolean compressContent;
     private OutputStream outputStream;
     private SocketChannel socketChannel;
 
@@ -83,26 +86,57 @@ public class HTTPResponse {
         this.socketChannel = socketChannel;
     }
 
+    public boolean isCompressContent() {
+        return compressContent;
+    }
+
+    public void setCompressContent(boolean compressContent) {
+        this.compressContent = compressContent;
+    }
+
     public void send() throws IOException {
+        if (this.isCompressContent() && this.getBody() != null) {
+            compressBody();
+        }
+
         StringBuilder builder = new StringBuilder();
         builder.append(statusLine).append("\r\n");
         this.headers.forEach((k, v) -> {
             builder.append(k).append(": ").append(v).append("\r\n");
         });
         builder.append("\r\n");
+
         System.out.println(builder.toString());
+
         ByteBuffer headerBuffer = StandardCharsets.UTF_8.encode(builder.toString());
+
         while (headerBuffer.hasRemaining()) {
             this.socketChannel.write(headerBuffer);
         }
 
         if (body != null && body.length > 0) {
-            System.out.println("Body is not null");
+            System.out.println("Response body content exists");
+
             ByteBuffer bodyBuffer = ByteBuffer.wrap(body);
-            while(bodyBuffer.hasRemaining()){
+            while (bodyBuffer.hasRemaining()) {
                 socketChannel.write(bodyBuffer);
             }
         }
     }
 
+    private void compressBody() throws IOException {
+        System.out.println("Compressing content");
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
+            gzipOutputStream.write(this.getBody());
+        }
+
+        this.setBody(byteArrayOutputStream.toByteArray());
+        System.out.println(this.getHeaders().toString());
+        this.getHeaders().remove("Content-Length");
+        System.out.println(this.getHeaders().toString());
+        this.getHeaders().put("Content-Length", String.valueOf(this.body.length));
+        this.getHeaders().put("Content-Encoding", "gzip");
+        System.out.println(this.getHeaders().toString());
+    }
 }
