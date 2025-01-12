@@ -50,6 +50,21 @@ public class HeaderHelper {
         return httpResponse;
     }
 
+    public static HTTPResponse createJsonResponse(String jsonResponse, HTTPResponse httpResponse) {
+        Map<String, String> headers = createHeaders("application/json", jsonResponse);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MM yyyy HH:mm:ss z", Locale.ENGLISH);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("EAT"));
+        headers.put("Date", dateFormat.format(new Date()));
+        httpResponse.setHeaders(headers);
+
+        httpResponse.setBody(jsonResponse.getBytes());
+        httpResponse.setStatusCode(200);
+        httpResponse.setOk(true);
+        httpResponse.setStatusLine(generateStatusLine(200));
+        
+        return httpResponse;
+    }
+
     private static String generateStatusLine(int statusCode) {
         return "HTTP/1.1 " + statusCode + " " + HTTPStatusCode.fromStatusCode(statusCode).getReasonPhrase();
     }
