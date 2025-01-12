@@ -2,12 +2,19 @@
     --green-accent: #16DA8C;
 }
 
-body, html {
+body,
+html {
     margin: 0;
-    font-family:  "Manrope", "Quicksand", serif !important;
+    font-family: "Manrope", "Quicksand", serif !important;
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin-bottom: 0px !important;
 }
 
@@ -18,34 +25,42 @@ p, h1, h2, h3, h4, h5, h6 {
     top: 0;
     left: 0;
     z-index: 1;
-    pointer-events: none; 
+    pointer-events: none;
     overflow: hidden;
     transform: translateX(-310px);
 }
 
 .line {
     position: absolute;
-    width: 120%; /* Extend beyond the viewport width for a complete diagonal */
-    height: 10px; /* Thickness of the line */
-    background: rgba(255, 255, 255, 0.1); /* Transparent white */
-    transform: rotate(135deg); /* Diagonal effect */
+    width: 120%;
+    /* Extend beyond the viewport width for a complete diagonal */
+    height: 10px;
+    /* Thickness of the line */
+    background: rgba(255, 255, 255, 0.1);
+    /* Transparent white */
+    transform: rotate(135deg);
+    /* Diagonal effect */
 }
+
 .line:nth-child(1) {
-    top: 20%; /* Position of the first line */
+    top: 20%;
+    /* Position of the first line */
     left: -10%;
 }
 
 .line:nth-child(2) {
-    top: 40%; /* Position of the second line */
+    top: 40%;
+    /* Position of the second line */
     left: -10%;
 }
 
 .line:nth-child(3) {
-    top: 60%; /* Position of the third line */
+    top: 60%;
+    /* Position of the third line */
     left: -10%;
 }
 
-.form-area {
+.form-area, .text-area {
     width: 33%;
     height: 100vh;
     position: absolute;
@@ -65,6 +80,10 @@ p, h1, h2, h3, h4, h5, h6 {
     margin-bottom: 32px !important;
 }
 
+.text-area {
+    letter-spacing: 2px;
+}
+
 .form-area input {
     background-color: transparent;
     border: none;
@@ -73,14 +92,14 @@ p, h1, h2, h3, h4, h5, h6 {
     color: white;
 }
 
-.form-area button {
+/* .form-area button {
     background-color: var(--green-accent);
     padding: 16px 84px;
     border: none;
     margin-top: 64px;
     color: white;
     border-radius: 4px;
-}
+} */
 
 .form-area input:focus-visible {
     outline-color: transparent !important;
@@ -92,5 +111,62 @@ p, h1, h2, h3, h4, h5, h6 {
 .form-area input:focus {
     outline: none;
     border-bottom: 1px solid white;
-     /* Custom border color */
+}
+
+.draw-border {
+    box-shadow: inset 0 0 0 2px white;
+    color: white;
+    transition: color 0.25s 0.0833333333s;
+    position: relative;
+}
+
+.draw-border::before,
+.draw-border::after {
+    border: 0 solid transparent;
+    box-sizing: border-box;
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    width: 0;
+    height: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.draw-border::before {
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.draw-border::after {
+    border-top-width: 2px;
+    border-right-width: 2px;
+}
+
+.draw-border:hover {
+    color: #16da8c;
+}
+
+.draw-border:hover::before,
+.draw-border:hover::after {
+    border-color: #16da8c;
+    transition: border-color 0s, width 0.25s, height 0.25s;
+    width: 100%;
+    height: 100%;
+}
+
+.draw-border:hover::before {
+    transition-delay: 0s, 0s, 0.25s;
+}
+
+.draw-border:hover::after {
+    transition-delay: 0s, 0.25s, 0s;
+}
+
+button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 16px 84px;
+    margin-top: 64px !important;
 }

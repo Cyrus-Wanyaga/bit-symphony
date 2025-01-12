@@ -21,6 +21,11 @@
         position: relative;
         clip-path: circle(40% at 100% 0);
         z-index: 2;
+        transition: .5s ease-in;
+    }
+
+    .background-image:hover {
+        clip-path: circle(42% at 100% 0);
     }
 
     .mask {
@@ -42,6 +47,11 @@
         color: white;
         flex-direction: column;
         z-index: 2;
+        pointer-events: none;
+    }
+
+    #title:hover .background-image {
+        transform: scale(1.1);
     }
 </style>
 
@@ -54,7 +64,7 @@
             <path
                 d="M8 1a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1zm1 13.5a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0m2 0a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0M9.5 1a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM9 3.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1h-5a.5.5 0 0 0-.5.5M1.5 2A1.5 1.5 0 0 0 0 3.5v7A1.5 1.5 0 0 0 1.5 12H6v2h-.5a.5.5 0 0 0 0 1H7v-4H1.5a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5H7V2z" />
         </svg>
-        <p style="font-size: 24px; letter-spacing: 5px;">BITSYMPHONY</p>
+        <p style="font-size: 24px; letter-spacing: 5px;" class="title-content">BITSYMPHONY</p>
     </div>
     <div class="line-group">
         <div class="line"></div>
@@ -65,11 +75,22 @@
         <div class="form-area">
             <h1 style="font-weight: bold;letter-spacing: 5px;">Welcome</h1>
             <p>Username</p>
-            <input type="text" placeholder="" tabindex="1"></input>
-            <button type="button">Continue</button>
+            <input type="text" placeholder="" tabindex="1" onchange="event => updateUsername(event)"></input>
+            <!-- <button type="button">Continue</button> -->
+             <button type="button" class="draw-border">Continue</button>
         </div>
     {% else %}
-        <div>Welcome Back</div>
+        <div class="text-area">Welcome Back Cyrus</div>
     {% endif %}
 </div>
+
+<script>
+    let username;
+
+    const updateUsername = (event) => {
+        event.preventDefault();
+        username = event.target.value;
+        console.log(username);
+    }
+</script>
 {% endblock %}
