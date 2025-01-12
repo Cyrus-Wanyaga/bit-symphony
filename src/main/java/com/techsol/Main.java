@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import com.techsol.app.LoadBalancedWebServer;
 import com.techsol.app.WebServer;
 import com.techsol.database.DatabaseManager;
 import com.techsol.database.dao.ConfigDao;
@@ -46,9 +47,18 @@ public class Main {
             System.out.println("Initialized Pebble Template Engine");
         }
 
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            WebServer webServer = new WebServer();
-        });
+        // Executor executor = Executors.newSingleThreadExecutor();
+        // executor.execute(() -> {
+        //     WebServer webServer = new WebServer();
+        // });
+        // WebServer webServer = new WebServer();
+        // webServer.start();
+        LoadBalancedWebServer server = new LoadBalancedWebServer(8086);
+
+        server.addBackend("127.0.0.1", 8087);
+        server.addBackend("127.0.0.1", 8088);
+        server.addBackend("127.0.0.1", 8089);
+
+        server.start();
     }
 }

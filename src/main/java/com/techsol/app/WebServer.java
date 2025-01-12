@@ -27,44 +27,110 @@ import com.techsol.web.ws.WebSocketHandlers;
 import com.techsol.web.ws.WebsocketHandler;
 
 public class WebServer {
-    private static final int PORT = 8086;
-    private static final ExecutorService threadPool = Executors
-            .newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    protected static final int DEFAULT_PORT = 8086;
+    protected final ExecutorService threadPool;
+    protected final int port;
+    protected volatile boolean isRunning = false;
 
     public WebServer() {
+        this(DEFAULT_PORT);
+    }
+
+    public WebServer(int port) {
+        System.out.println("Super port: " + port);
+        this.port = port;
+        this.threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    }
+
+    public void start() {
+        isRunning = true;
+        initializeServer();
+    }
+
+    protected void initializeServer() {
         try (Selector selector = Selector.open();
                 ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
-            serverChannel.bind(new InetSocketAddress(PORT));
-            serverChannel.configureBlocking(false);
-
-            serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-
-            System.out.println("Server started on port " + PORT);
-
-            while (true) {
-                selector.select();
-                Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-
-                while (keyIterator.hasNext()) {
-                    SelectionKey key = keyIterator.next();
-                    keyIterator.remove();
-
-                    if (key.isAcceptable()) {
-                        ServerSocketChannel server = (ServerSocketChannel) key.channel();
-                        SocketChannel clientChannel = serverChannel.accept();
-                        clientChannel.configureBlocking(false);
-                        clientChannel.register(selector, SelectionKey.OP_READ);
-                    } else if (key.isReadable()) {
-                        SocketChannel clientChannel = (SocketChannel) key.channel();
-                        handleRequest(clientChannel, key);
-                    }
-                }
-            }
+            System.out.println("Doing de ting");
+            configureServerChannel(serverChannel);
+            handleConnections(selector, serverChannel);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    protected void configureServerChannel(ServerSocketChannel serverChannel) throws IOException {
+        serverChannel.bind(new InetSocketAddress(port));
+        serverChannel.configureBlocking(false);
+
+        System.out.println("Server started on port: " + port);
+    }
+
+    protected void handleConnections(Selector selector, ServerSocketChannel serverChannel) throws IOException {
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+        while (isRunning) {
+            selector.select();
+            Set<SelectionKey> selectedKeys = selector.selectedKeys();
+            Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+
+            while (keyIterator.hasNext()) {
+                SelectionKey key = keyIterator.next();
+                keyIterator.remove();
+
+                if (key.isAcceptable()) {
+                    handleAccept(selector, serverChannel);
+                } else if (key.isReadable()) {
+                    handleRead(key);
+                }
+            }
+        }
+    }
+
+    protected void handleAccept(Selector selector, ServerSocketChannel serverChannel) throws IOException {
+        SocketChannel clientChannel = serverChannel.accept();
+        clientChannel.configureBlocking(false);
+        clientChannel.register(selector, SelectionKey.OP_READ);
+    }
+
+    protected void handleRead(SelectionKey key) throws IOException {
+        SocketChannel clientChannel = (SocketChannel) key.channel();
+        handleRequest(clientChannel, key);
+    }
+
+    // public WebServer() {
+    // try (Selector selector = Selector.open();
+    // ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
+    // serverChannel.bind(new InetSocketAddress(DEFAULT_PORT));
+    // serverChannel.configureBlocking(false);
+
+    // serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+    // System.out.println("Server started on port " + DEFAULT_PORT);
+
+    // while (true) {
+    // selector.select();
+    // Set<SelectionKey> selectedKeys = selector.selectedKeys();
+    // Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+
+    // while (keyIterator.hasNext()) {
+    // SelectionKey key = keyIterator.next();
+    // keyIterator.remove();
+
+    // if (key.isAcceptable()) {
+    // ServerSocketChannel server = (ServerSocketChannel) key.channel();
+    // SocketChannel clientChannel = serverChannel.accept();
+    // clientChannel.configureBlocking(false);
+    // clientChannel.register(selector, SelectionKey.OP_READ);
+    // } else if (key.isReadable()) {
+    // SocketChannel clientChannel = (SocketChannel) key.channel();
+    // handleRequest(clientChannel, key);
+    // }
+    // }
+    // }
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    // }
 
     /**
      * Handles incoming HTTP request from the given client channel.
@@ -73,7 +139,7 @@ public class WebServer {
      * @param key    the SelectionKey associated with the client
      * @throws IOException if an I/O error occurs during request handling
      */
-    private static void handleRequest(SocketChannel client, SelectionKey key) throws IOException {
+    protected void handleRequest(SocketChannel client, SelectionKey key) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(8192);
         StringBuilder requestBuilder = new StringBuilder();
 
@@ -118,6 +184,8 @@ public class WebServer {
                             handler = RouteRegistry.ROUTES.get("/**");
                             if (handler != null) {
                                 handler.accept(request, response);
+                            } else {
+
                             }
                         }
 
@@ -154,7 +222,7 @@ public class WebServer {
      * @return the parsed HTTP request
      * @throws MalformedURLException if the request line is malformed
      */
-    private static HTTPRequest parseRequest(String requestString) throws MalformedURLException {
+    protected HTTPRequest parseRequest(String requestString) throws MalformedURLException {
         String[] lines = requestString.split("\r\n");
         String[] requestLineParts = lines[0].split(" ");
 
@@ -182,8 +250,9 @@ public class WebServer {
      * @param request the HTTP request string
      * @return true if the request is a WebSocket handshake request, false otherwise
      */
-    private static boolean isWebSocketHandshake(String request) {
-        return request.contains("Connection: Upgrade") && request.contains("Upgrade: websocket");
+    protected boolean isWebSocketHandshake(String request) {
+        return (request.contains("Connection: Upgrade") || request.contains("Connection: keep-alive, Upgrade")) &&
+                request.contains("Upgrade: websocket");
     }
 
     /**
@@ -195,7 +264,7 @@ public class WebServer {
      *                      and WebSocket protocol
      * @throws IOException if an I/O error occurs during response write
      */
-    private static void handleWebSocketHandshake(SocketChannel clientChannel, HTTPRequest request) throws IOException {
+    protected void handleWebSocketHandshake(SocketChannel clientChannel, HTTPRequest request) throws IOException {
         String webSocketKey = request.getHeaders().get("Sec-WebSocket-Key");
         String acceptKey = generateWebSocketAcceptKey(webSocketKey);
 
@@ -232,7 +301,7 @@ public class WebServer {
      *         magic string
      * @throws RuntimeException if there is an error generating the hash
      */
-    private static String generateWebSocketAcceptKey(String key) {
+    protected String generateWebSocketAcceptKey(String key) {
         try {
             String acceptSeed = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
@@ -251,11 +320,16 @@ public class WebServer {
      * @param clientChannel the SocketChannel associated with the WebSocket client
      * @param buffer        the ByteBuffer containing the incoming WebSocket message
      */
-    private static void handleWebSocketRequest(SocketChannel clientChannel, ByteBuffer buffer) {
+    protected void handleWebSocketRequest(SocketChannel clientChannel, ByteBuffer buffer) {
         WebsocketHandler handler = WebSocketHandlers.getWebSocketHandlers().get(clientChannel);
         if (handler != null) {
             System.out.println(handler.getClass().getName());
             handler.onMessage(buffer);
         }
+    }
+
+    public void stop() {
+        isRunning = false;
+        threadPool.shutdown();
     }
 }
