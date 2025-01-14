@@ -1,6 +1,8 @@
-package com.techsol.app;
+package com.techsol.web.server;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.techsol.app.WebServer;
 
 public class BackendServer {
     private final String host;

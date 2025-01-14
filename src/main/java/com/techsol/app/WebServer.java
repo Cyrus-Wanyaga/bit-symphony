@@ -97,41 +97,6 @@ public class WebServer {
         handleRequest(clientChannel, key);
     }
 
-    // public WebServer() {
-    // try (Selector selector = Selector.open();
-    // ServerSocketChannel serverChannel = ServerSocketChannel.open()) {
-    // serverChannel.bind(new InetSocketAddress(DEFAULT_PORT));
-    // serverChannel.configureBlocking(false);
-
-    // serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-
-    // System.out.println("Server started on port " + DEFAULT_PORT);
-
-    // while (true) {
-    // selector.select();
-    // Set<SelectionKey> selectedKeys = selector.selectedKeys();
-    // Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-
-    // while (keyIterator.hasNext()) {
-    // SelectionKey key = keyIterator.next();
-    // keyIterator.remove();
-
-    // if (key.isAcceptable()) {
-    // ServerSocketChannel server = (ServerSocketChannel) key.channel();
-    // SocketChannel clientChannel = serverChannel.accept();
-    // clientChannel.configureBlocking(false);
-    // clientChannel.register(selector, SelectionKey.OP_READ);
-    // } else if (key.isReadable()) {
-    // SocketChannel clientChannel = (SocketChannel) key.channel();
-    // handleRequest(clientChannel, key);
-    // }
-    // }
-    // }
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // }
-
     /**
      * Handles incoming HTTP request from the given client channel.
      *

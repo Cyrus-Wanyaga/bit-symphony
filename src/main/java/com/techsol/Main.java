@@ -1,13 +1,12 @@
 package com.techsol;
 
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import com.techsol.app.LoadBalancedWebServer;
-import com.techsol.app.WebServer;
 import com.techsol.database.DatabaseManager;
 import com.techsol.database.dao.ConfigDao;
+import com.techsol.web.server.BackendRegistry;
+import com.techsol.web.server.HealthChecker;
 import com.techsol.web.templateengine.PebbleEngineProvider;
 
 import io.pebbletemplates.pebble.PebbleEngine;
@@ -53,12 +52,15 @@ public class Main {
         // });
         // WebServer webServer = new WebServer();
         // webServer.start();
-        LoadBalancedWebServer server = new LoadBalancedWebServer(8086);
+        BackendRegistry backendRegistry = new BackendRegistry();
+        LoadBalancedWebServer server = new LoadBalancedWebServer(8086, backendRegistry);
+        HealthChecker healthChecker = new HealthChecker(backendRegistry);
 
         server.addBackend("127.0.0.1", 8087);
         server.addBackend("127.0.0.1", 8088);
         server.addBackend("127.0.0.1", 8089);
 
+        healthChecker.startHealthChecks();
         server.start();
     }
 }
