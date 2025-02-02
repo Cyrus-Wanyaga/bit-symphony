@@ -12,26 +12,32 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.techsol.web.server.BackendRegistry;
+import com.techsol.web.server.BackendServer;
+
 public class LoadBalancedWebServer extends WebServer {
-    private final List<BackendServer> backends;
+    // private final List<BackendServer> backends;
     private final Map<String, BackendServer> sessionAffinity;
     private final Map<SocketChannel, BackendServer> connectionToBackend;
     private final AtomicInteger currentBackendIndex;
-    private final HealthChecker healthChecker;
+    private final BackendRegistry backendRegistry;
+    // private final HealthChecker healthChecker;
 
-    public LoadBalancedWebServer(int port) {
+    public LoadBalancedWebServer(int port, BackendRegistry backendRegistry) {
         super(port);
         System.out.println("After super");
-        this.backends = new ArrayList<>();
+        // this.backends = new ArrayList<>();
         this.sessionAffinity = new ConcurrentHashMap<>();
         this.connectionToBackend = new ConcurrentHashMap<>();
         this.currentBackendIndex = new AtomicInteger(0);
-        this.healthChecker = new HealthChecker(backends);
+        this.backendRegistry = backendRegistry;
+        // this.healthChecker = new HealthChecker(backends);
     }
 
     public void addBackend(String host, int port) {
         BackendServer server = new BackendServer(host, port);
-        backends.add(server);
+        // backends.add(server);
+        backendRegistry.addBackend(server);
         server.start();
     }
 
@@ -67,10 +73,10 @@ public class LoadBalancedWebServer extends WebServer {
     }
 
     private BackendServer selectBackend(SocketChannel clientChannel) {
-        List<BackendServer> healthyServers = backends.stream()
-                .filter(BackendServer::isHealthy)
-                .toList();
-
+        List<BackendServer> healthyServers = backendRegistry.getBackendsCopy().stream()
+        .filter(BackendServer::isHealthy)
+        .toList();
+        
         if (healthyServers.isEmpty()) {
             return null;
         }
@@ -100,14 +106,15 @@ public class LoadBalancedWebServer extends WebServer {
 
     @Override
     public void start() {
-        healthChecker.startHealthChecks();
+        // healthChecker.startHealthChecks();
         super.start();
     }
 
     @Override
     public void stop() {
         super.stop();
-        backends.forEach(backend -> backend.getServer().stop());
+        backendRegistry.getBackendsCopy().forEach(backend -> backend.getServer().stop());
+        // backends.forEach(backend -> backend.getServer().stop());
     }
 
     private void sendErrorResponse(SocketChannel clientChannel) throws IOException {
