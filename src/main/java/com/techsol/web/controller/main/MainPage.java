@@ -44,9 +44,9 @@ public class MainPage {
 
         String output = writer.toString();
 
-        IndentHTML.setInput(output);
-        String indentedOutput = IndentHTML.transformInput();
+        // IndentHTML.setInput(output);
+        // String indentedOutput = IndentHTML.transformInput();
         httpResponse.setCompressContent(true);
-        HeaderHelper.createHtmlResponse(indentedOutput, httpResponse);
+        HeaderHelper.createHtmlResponse(output, httpResponse);
     }
 }

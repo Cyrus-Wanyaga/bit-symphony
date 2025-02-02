@@ -24,9 +24,9 @@
         transition: .5s ease-in;
     }
 
-    .background-image:hover {
+    /* .background-image:hover {
         clip-path: circle(42% at 100% 0);
-    }
+    } */
 
     .mask {
         position: absolute;
@@ -72,25 +72,67 @@
         <div class="line"></div>
     </div>
     {% if configs.initial_run == "true" %}
+    <div x-data="
+        {
+            step: 1,
+            formData: {
+                username: '',
+                defaultDirectory: '',
+                fileChunkSize: 0,
+                testIntervalTime: 0
+            },
+            isLastStep: false,
+
+            nextStep() {
+                if (this.step === 1 && !this.formData.username) {
+                    return;
+                }
+
+                this.step++;
+                this.isLastStep = (this.step === 4);
+            },
+
+            prevStep() {
+                this.step--;
+                this.isLastStep = false;
+            },
+
+        }
+    ">
         <div class="form-area">
-            <h1 style="font-weight: bold;letter-spacing: 5px;">Welcome</h1>
-            <p>Username</p>
-            <input type="text" placeholder="" tabindex="1" onchange="event => updateUsername(event)"></input>
-            <!-- <button type="button">Continue</button> -->
-             <button type="button" class="draw-border">Continue</button>
+            <div x-show="step === 1" style="text-align: center;">
+                <h1 style="font-weight: bold;letter-spacing: 5px;">Welcome</h1>
+                <p>Username</p>
+                <input x-model="formData.username" type="text" tabindex="1"></input>
+            </div>
+            <div x-show="step === 2" style="text-align: center;">
+                <h1 style="font-weight: bold;letter-spacing: 5px;">Configuration</h1>
+                <p>Default Directory</p>
+                <input x-model="formData.defaultDirectory" type="text" tabindex="1"></input>
+            </div>
+            <button x-show="step < 4" @click="nextStep" type="button" class="draw-border">Continue</button>
+            <button x-show="isLastStep" @click="nextStep" type="button" class="draw-border">Continue</button>
         </div>
+        <div class="helper-text">
+            <p>Enter your username so we&apos;ll know what to call you</p>
+        </div>
+    </div>
     {% else %}
-        <div class="text-area">Welcome Back Cyrus</div>
+    <div class="text-area">Welcome Back Cyrus</div>
     {% endif %}
 </div>
 
 <script>
+    console.log("Why always me")
     let username;
 
     const updateUsername = (event) => {
-        event.preventDefault();
-        username = event.target.value;
+        username = event.value;
         console.log(username);
+    }
+
+    const registerUser = (event) => {
+        console.log('Registering', username);
     }
 </script>
 {% endblock %}

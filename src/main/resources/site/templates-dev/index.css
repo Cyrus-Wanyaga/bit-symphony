@@ -60,7 +60,8 @@ h6 {
     left: -10%;
 }
 
-.form-area, .text-area {
+.form-area,
+.text-area {
     width: 33%;
     height: 100vh;
     position: absolute;
@@ -169,4 +170,13 @@ button {
     cursor: pointer;
     padding: 16px 84px;
     margin-top: 64px !important;
+}
+
+.helper-text {
+    color: white;
+    position: absolute;
+    top: 35%;
+    z-index: 1000;
+    right: 0;
+    padding: 0 128px;
 }
