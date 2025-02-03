@@ -72,13 +72,14 @@ h6 {
     color: white;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
 }
 
 .form-area p {
-    margin-top: 32px !important;
-    margin-bottom: 32px !important;
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+    text-align: left;
 }
 
 .text-area {
@@ -89,8 +90,13 @@ h6 {
     background-color: transparent;
     border: none;
     border-bottom: 1px solid white;
-    text-align: center;
+    text-align: left;
     color: white;
+    width: 100%;
+}
+
+.additional-inputs {
+    margin-top: 32px;
 }
 
 /* .form-area button {
@@ -148,6 +154,15 @@ h6 {
     color: #16da8c;
 }
 
+.draw-border-back:hover {
+    color: red;
+}
+
+.draw-border-back:hover::before,
+.draw-border-back:hover::after {
+    border-color: red !important;
+}
+
 .draw-border:hover::before,
 .draw-border:hover::after {
     border-color: #16da8c;
@@ -169,14 +184,23 @@ button {
     border: none;
     cursor: pointer;
     padding: 16px 84px;
-    margin-top: 64px !important;
+    margin-top: 32px !important;
 }
 
-.helper-text {
+.helper-text p{
     color: white;
     position: absolute;
     top: 35%;
     z-index: 1000;
     right: 0;
     padding: 0 128px;
+    transition: 1s ease-in linear;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }

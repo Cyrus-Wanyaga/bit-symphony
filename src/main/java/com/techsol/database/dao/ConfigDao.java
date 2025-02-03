@@ -39,6 +39,8 @@ public class ConfigDao {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Failed to update config: " + e.getMessage());
+
+            e.printStackTrace();
         }
 
         return false;

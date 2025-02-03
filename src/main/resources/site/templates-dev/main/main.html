@@ -97,24 +97,41 @@
                 this.isLastStep = false;
             },
 
+            async submitConfig() {
+                console.log(JSON.stringify(this.formData));
+            }
         }
     ">
         <div class="form-area">
             <div x-show="step === 1" style="text-align: center;">
-                <h1 style="font-weight: bold;letter-spacing: 5px;">Welcome</h1>
+                <h1 style="font-weight: bold; text-align: left;">Welcome</h1>
                 <p>Username</p>
-                <input x-model="formData.username" type="text" tabindex="1"></input>
+                <input x-model="formData.username" placeholder="Please Enter Your Username" type="text"
+                    tabindex="1"></input>
             </div>
-            <div x-show="step === 2" style="text-align: center;">
-                <h1 style="font-weight: bold;letter-spacing: 5px;">Configuration</h1>
+            <div x-show="step >= 2" style="text-align: center;">
+                <h1 style="font-weight: bold;">Configuration</h1>
                 <p>Default Directory</p>
-                <input x-model="formData.defaultDirectory" type="text" tabindex="1"></input>
+                <input x-show="step > 1" x-model="formData.defaultDirectory" placeholder="Default Directory" type="text" 
+                    tabindex="1"></input>
+                <input x-show="step > 2" x-model="formData.fileChunkSize" placeholder="File Chunk Size" type="number" class="additional-inputs"
+                    tabindex="1"></input>
+                <input x-show="step > 3" x-model="formData.testIntervalTime" placeholder="Test Interval Time" class="additional-inputs"
+                    type="number" tabindex="1"></input>
             </div>
             <button x-show="step < 4" @click="nextStep" type="button" class="draw-border">Continue</button>
-            <button x-show="isLastStep" @click="nextStep" type="button" class="draw-border">Continue</button>
+            <button x-show="isLastStep" @click="submitConfig" type="button" class="draw-border">Finish</button>
+            <button x-show="step > 1" @click="prevStep" type="button" class="draw-border draw-border-back">Back</button>
         </div>
         <div class="helper-text">
-            <p>Enter your username so we&apos;ll know what to call you</p>
+            <p x-show="step === 1">Enter your username so we&apos;ll know what to call you</p>
+            <p x-show="step === 2">The default directory is where system generated files with test data will exist.
+                <br /> All content can be managed from the app.
+            </p>
+            <p x-show="step === 3">This value dictates the number of bytes used to read the file at the fixed number of
+                bytes in memory. </p>
+            <p x-show="step === 4">The time taken between tests to observe changes in system performance. <br />
+                The value can be changed later in system settings. </p>
         </div>
     </div>
     {% else %}

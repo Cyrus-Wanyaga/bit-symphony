@@ -6,4 +6,6 @@ CREATE TABLE IF NOT EXISTS app_config (
 INSERT INTO app_config (key, value)
 VALUES ('initial_run', 'true'),
        ('default_directory', 'files'),
-       ('chunk_size', '1024');
+       ('chunk_size', '1024'),
+       ('test_interval', '1000'),
+       ('username', null);
