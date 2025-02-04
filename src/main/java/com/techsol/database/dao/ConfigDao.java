@@ -34,8 +34,9 @@ public class ConfigDao {
         String query = "UPDATE app_config SET value = ? WHERE key = ?";
         try (Connection connection = DatabaseManager.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, key);
-            stmt.setString(2, value);
+            stmt.setString(1, value);
+            stmt.setString(2, key);
+
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Failed to update config: " + e.getMessage());

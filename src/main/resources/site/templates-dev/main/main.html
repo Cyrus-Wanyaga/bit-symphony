@@ -98,7 +98,21 @@
             },
 
             async submitConfig() {
-                console.log(JSON.stringify(this.formData));
+                try {
+                    const response = await fetch('/api/config/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(this.formData)
+                    });
+
+                    if (response.ok) {
+                        console.log('Configuration saved successfully');
+                    }
+                } catch (error) {
+                    console.error('Error saving configs:', error);
+                }
             }
         }
     ">
@@ -140,7 +154,6 @@
 </div>
 
 <script>
-    console.log("Why always me")
     let username;
 
     const updateUsername = (event) => {

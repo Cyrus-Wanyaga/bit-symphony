@@ -19,10 +19,32 @@ public class ConfigAPI {
         JSONObject responseObject = new JSONObject();
 
         Iterator<String> keys = requestObject.keys();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            String value = requestObject.getString(key);
-            ConfigDao.updateConfig(key, value);
+        try {
+            while (keys.hasNext()) {
+                String key = keys.next();
+                String value = requestObject.getString(key);
+                String newKey;
+
+                if (key.toLowerCase().contains("defaultdirectory")) {
+                    newKey = "default_directory";
+                } else if (key.toLowerCase().contains("chunksize")) {
+                    newKey = "chunk_size";
+                } else if (key.toLowerCase().contains("intervaltime")) {
+                    newKey = "test_interval";
+                } else {
+                    newKey = key;
+                }
+
+                ConfigDao.updateConfig(newKey, value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            responseObject.put("statusMessage", "Failed to save configs");
+            HeaderHelper.createJsonResponse(requestBodyString, response);
+            response.setStatusCode(500);
+            response.setOk(false);
+            return;
         }
 
         responseObject.put("statusMessage", "Saved configs successfully");
