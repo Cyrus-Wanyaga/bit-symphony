@@ -78,7 +78,7 @@
             formData: {
                 username: '',
                 defaultDirectory: '',
-                fileChunkSize: 0,
+                fileChunkSize: {{configs.chunk_size}},
                 testIntervalTime: 0
             },
             isLastStep: false,
@@ -126,12 +126,12 @@
             <div x-show="step >= 2" style="text-align: center;">
                 <h1 style="font-weight: bold;">Configuration</h1>
                 <p>Default Directory</p>
-                <input x-show="step > 1" x-model="formData.defaultDirectory" placeholder="Default Directory" type="text" 
+                <input x-show="step > 1" x-model="formData.defaultDirectory" placeholder="Default Directory" type="text"
                     tabindex="1"></input>
-                <input x-show="step > 2" x-model="formData.fileChunkSize" placeholder="File Chunk Size" type="number" class="additional-inputs"
-                    tabindex="1"></input>
-                <input x-show="step > 3" x-model="formData.testIntervalTime" placeholder="Test Interval Time" class="additional-inputs"
-                    type="number" tabindex="1"></input>
+                <input x-show="step > 2" x-model="formData.fileChunkSize" placeholder="File Chunk Size" type="number"
+                    default="{{ configs.chunk_size }}" class="additional-inputs" tabindex="1"></input>
+                <input x-show="step > 3" x-model="formData.testIntervalTime" placeholder="Test Interval Time"
+                    class="additional-inputs" type="number" tabindex="1"></input>
             </div>
             <button x-show="step < 4" @click="nextStep" type="button" class="draw-border">Continue</button>
             <button x-show="isLastStep" @click="submitConfig" type="button" class="draw-border">Finish</button>
@@ -154,6 +154,7 @@
 </div>
 
 <script>
+    console.log("{{configs.chunk_size}}")
     let username;
 
     const updateUsername = (event) => {
