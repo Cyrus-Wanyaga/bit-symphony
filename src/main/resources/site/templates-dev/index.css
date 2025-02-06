@@ -74,6 +74,8 @@ h6 {
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
+    translate: -100% 0;
+    animation: slideIn 1s forwards;
 }
 
 .form-area p {
@@ -125,6 +127,25 @@ h6 {
     color: white;
     transition: color 0.25s 0.0833333333s;
     position: relative;
+}
+
+#title {
+    position: absolute;
+    top: 20%;
+    right: 8%;
+    display: flex;
+    align-items: flex-start;
+    color: white;
+    flex-direction: column;
+    z-index: 2;
+    opacity: 0;
+    translate: 100% 0;
+    animation: fadeIn 1s forwards, slideIn 1s forwards;
+    pointer-events: none;
+}
+
+#title:hover .background-image {
+    transform: scale(1.1);
 }
 
 .draw-border::before,
@@ -187,20 +208,44 @@ button {
     margin-top: 32px !important;
 }
 
-.helper-text p{
+.helper-text p {
     color: white;
     position: absolute;
     top: 35%;
     z-index: 1000;
     right: 0;
     padding: 0 128px;
+    translate: 100% 0;
     transition: 1s ease-in linear;
     opacity: 0;
-    animation: fadeIn 1s forwards;
+    animation: fadeIn 1s forwards, slideIn 1s forwards;
+}
+
+.welcome-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    height: 100%;
+    display: none;
+}
+
+.welcome-text h1 {
+    align-self: center;
+    text-align: center;
+    color: white;
+    width: inherit;
 }
 
 @keyframes fadeIn {
     to {
         opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    to {
+        translate: 0px 0px;
     }
 }
