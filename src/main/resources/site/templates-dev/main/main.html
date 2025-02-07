@@ -132,7 +132,7 @@
                 The value can be changed later in system settings. </p>
         </div>
         <div class="welcome-text">
-            <h1>Welcome Cyrus</h1>
+            <h1 class="welcome-text-name"></h1>
         </div>
     </div>
     {% else %}
@@ -146,6 +146,8 @@
     const lineGroup = document.querySelector('.line-group');
     const helperText = document.querySelector(".helper-text");
     const backgroundImg = document.querySelector(".background-image");
+    const welcomeText = document.querySelector(".welcome-text");
+    const welcomeName = document.querySelector(".welcome-text-name");
 
     window.addEventListener('load', () => {
         console.log("Document loaded");
@@ -198,6 +200,16 @@
                         clipPath: ['circle(40% at 100% 0)', 'circle(150% at 50% 50%)'], // Expanding the circle to full screen
                         filter: ['grayscale(100%)', 'grayscale(0%)'],
                         easing: 'easeInOutQuad'
+                    })
+                    .add({
+                        targets: [welcomeText],
+                        translateY: [50, 0],
+                        opacity: [0, 1],
+                        duration: 1000,
+                        begin: () => {
+                            welcomeText.style.display = 'flex';
+                            welcomeName.innerHTML = `Welcome ${formData.username}`;
+                        }
                     });
             }
         });
