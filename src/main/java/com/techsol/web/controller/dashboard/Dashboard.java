@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
+import com.techsol.config.Constants;
 import com.techsol.utils.transform.IndentHTML;
 import com.techsol.web.annotations.HTTPPath;
 import com.techsol.web.http.HTTPRequest;
@@ -27,7 +28,7 @@ public class Dashboard {
 
     @HTTPPath(path = "/dashboard")
     public void index(HTTPRequest request, HTTPResponse httpResponse) throws IOException, TransformerException {
-        PebbleTemplate template = new PebbleEngineProvider().getPebbleEngine().getTemplate("site/templates/index.peb");
+        PebbleTemplate template = new PebbleEngineProvider().getPebbleEngine().getTemplate(Constants.TEMPLATES_PATH + "dashboard" + Constants.FILE_SEPARATOR + "dashboard.peb");
 
         Map<String, Object> context = new HashMap<>();
         context.put("websiteTitle", "Wow...this is nice");

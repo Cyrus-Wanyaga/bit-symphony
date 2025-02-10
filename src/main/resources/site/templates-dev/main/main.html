@@ -2,41 +2,7 @@
 
 {% block content %}
 <style>
-    .background {
-        background: rgb(15, 15, 15);
-        background: linear-gradient(0deg, rgba(15, 15, 15, 1) 0%, rgba(13, 13, 13, 0.8001401244091386) 100%);
-        /* background-image: linear-gradient(to bottom, #434343 0%, black 100%); */
-        /* background-image: linear-gradient(60deg, #29323c 0%, #485563 100%); */
-        height: 100vh;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        position: relative;
-    }
-
-    .background-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        filter: grayscale(100%);
-        position: relative;
-        clip-path: circle(40% at 100% 0);
-        z-index: 2;
-        transition: .5s ease-in;
-    }
-
-    /* .background-image:hover {
-        clip-path: circle(42% at 100% 0);
-    } */
-
-    /* .mask {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100px;
-        height: 100px;
-        -webkit-mask-image: url("data:image/svg+xml,<svg width='100' height='100'><circle cx='50' cy='50' r='50' fill='white'/></svg>");
-        mask-image: url("data:image/svg+xml,<svg width='100' height='100'><circle cx='50' cy='50' r='50' fill='white'/></svg>");
-    } */
+    
 </style>
 
 <div class="background">
@@ -92,7 +58,7 @@
 
                     if (response.ok) {
                         console.log('Configuration saved successfully');
-                        Alpine.store('animeTransition').animateConfigCompletion(this.formData);
+                        await Alpine.store('animeTransition').animateConfigCompletion(this.formData);
                     }
                 } catch (error) {
                     console.error('Error saving configs:', error);
@@ -115,7 +81,7 @@
                 <input x-show="step > 2" x-model="formData.fileChunkSize" placeholder="File Chunk Size" type="number"
                     default="{{ configs.chunk_size }}" class="additional-inputs" tabindex="1"></input>
                 <input x-show="step > 3" x-model="formData.testIntervalTime" placeholder="Test Interval Time"
-                    class="additional-inputs" type="number" tabindex="1"></input>
+                    class="additional-inputs" type="number" default="{{ configs.test_interval }}" tabindex="1"></input>
             </div>
             <button x-show="step < 4" @click="nextStep" type="button" class="draw-border">Continue</button>
             <button x-show="isLastStep" @click="submitConfig" type="button" class="draw-border">Finish</button>
@@ -136,30 +102,26 @@
         </div>
     </div>
     {% else %}
-    <div class="text-area">Welcome Back Cyrus</div>
+    <div class="text-area">
+        <h1>Welcome Back {{ configs.username }}</h1>
+    </div>
     {% endif %}
 </div>
 
 <script>
+    const backgroundImg = document.querySelector(".background-image");
+    const lineGroup = document.querySelector('.line-group');
+
+    {% if configs.initial_run == "true" %}
     const formArea = document.querySelector(".form-area");
     const title = document.querySelector("#title");
-    const lineGroup = document.querySelector('.line-group');
     const helperText = document.querySelector(".helper-text");
-    const backgroundImg = document.querySelector(".background-image");
     const welcomeText = document.querySelector(".welcome-text");
     const welcomeName = document.querySelector(".welcome-text-name");
 
-    window.addEventListener('load', () => {
-        console.log("Document loaded");
-    });
-
     document.addEventListener('alpine:init', () => {
         Alpine.store('animeTransition', {
-            animateConfigCompletion(formData) {
-                const text = `Welcome ${formData.username}`.trim();
-                welcomeName.innerHTML = text.split("").map(char => `<span style="display: inline-block; opacity: 0;">${char === " " ? "&nbsp;" : char}</span>`)
-                    .join("");
-
+            async animateConfigCompletion(formData) {
                 anime.timeline({
                     easing: 'easeInOutQuad'
                 })
@@ -192,32 +154,65 @@
                     })
                     .add({
                         targets: lineGroup.querySelectorAll('.line'),
-                        top: '-100%',
-                        // translateX: ['0%', '100%'],
+                        // top: '-100%',
                         opacity: [1, 0],
                         duration: 500,
                         delay: anime.stagger(100)
                     })
                     .add({
                         targets: backgroundImg,
-                        duration: 1000, // Make it smooth
+                        duration: 1000,
                         clipPath: ['circle(40% at 100% 0)', 'circle(150% at 50% 50%)'], // Expanding the circle to full screen
-                        filter: ['grayscale(100%)', 'grayscale(0%)'],
-                        easing: 'easeInOutQuad'
+                        filter: ['grayscale(100%) brightness(0)', 'grayscale(0%) brightness(2)'],
                     })
                     .add({
-                        targets: ".welcome-text-name span",
-                        translateY: [20, 0],
+                        targets: welcomeText,
+                        translateY: [50, 0],
                         opacity: [0, 1],
-                        duration: 100,
-                        delay: anime.stagger(100),
+                        duration: 500,
+                        // delay: anime.stagger(100),
                         begin: () => {
                             welcomeText.style.display = 'flex';
-                            // welcomeName.innerHTML = `Welcome ${formData.username}`;
+                            welcomeName.innerHTML = `Welcome ${formData.username}`;
                         }
                     });
             }
         });
     });
+    {% else %}
+    console.log("Not the initial run");
+    const textArea = document.querySelector(".text-area");
+
+    window.addEventListener('load', () => {
+        const animation = anime.timeline({
+            easing: 'easeInOutQuad'
+        })
+            .add({
+                targets: lineGroup.querySelectorAll('.line'),
+                // top: '-100%',
+                opacity: [1, 0],
+                duration: 500,
+                delay: anime.stagger(100)
+            })
+            .add({
+                targets: backgroundImg,
+                duration: 1000,
+                clipPath: ['circle(40% at 100% 0)', 'circle(150% at 50% 50%)'], // Expanding the circle to full screen
+                filter: ['grayscale(100%) brightness(0)', 'grayscale(0%) brightness(2)'],
+            })
+            .add({
+                targets: textArea,
+                opacity: [0, 1],
+                translateY: ['100%', '0'],
+                duration: 1000
+            });
+
+        animation.finished.then(() => {
+            setTimeout(() => {
+                window.location.href = "/dashboard";
+            }, 0);
+        });
+    });
+    {% endif %}
 </script>
 {% endblock %}

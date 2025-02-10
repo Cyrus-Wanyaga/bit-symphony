@@ -37,6 +37,8 @@ public class ConfigAPI {
 
                 ConfigDao.updateConfig(newKey, value);
             }
+
+            ConfigDao.updateConfig("initial_run", "false");
         } catch (Exception e) {
             e.printStackTrace();
 

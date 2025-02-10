@@ -18,6 +18,30 @@ h6 {
     margin-bottom: 0px !important;
 }
 
+.background, .background-flex {
+    background: rgb(15, 15, 15);
+    background: linear-gradient(0deg, rgba(15, 15, 15, 1) 0%, rgba(13, 13, 13, 0.8001401244091386) 100%);
+    overflow-x: hidden;
+}
+
+.background {
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.background-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    position: relative;
+    clip-path: circle(40% at 100% 0);
+    z-index: 2;
+    transition: .5s ease-in;
+}
+
 .line-group {
     position: absolute;
     width: 100%;
@@ -62,20 +86,35 @@ h6 {
 
 .form-area,
 .text-area {
-    width: 33%;
     height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 2;
-    padding: 64px;
     color: white;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
+    pointer-events: none;
+}
+
+.form-area {
+    width: 33%;
+    padding: 64px;
     translate: -100% 0;
     animation: slideIn 1s forwards;
+}
+
+.text-area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    /* translate: 0 100%;
+    animation: slideUp 1s forwards;
+    animation-delay: 1.8s; */
 }
 
 .form-area p {
@@ -248,4 +287,12 @@ button {
     to {
         translate: 0px 0px;
     }
+}
+
+.side-nav {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    background-color: rgba(0,0,0, 0.5);
+    height: 100%;
 }

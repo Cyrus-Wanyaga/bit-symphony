@@ -1,0 +1,26 @@
+{% extends "../index.peb" %}
+
+{% block content %}
+<div class="background">
+    <div class="side-nav">
+        {% block sidenav %}
+        {% endblock %}
+    </div>
+</div>
+<script>
+    const getOSDetails = async () => {
+        await fetch("/api/resource_monitor/os_details", {
+            method: 'GET',
+            redirect: "follow",
+        }).then((response) => {
+            return response.json();
+        }).then((result) => {
+            console.log(result);
+        }).catch((error) => {
+            console.error(error);
+        });
+    };
+
+    getOSDetails();
+</script>
+{% endblock %}
