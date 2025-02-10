@@ -156,6 +156,10 @@
     document.addEventListener('alpine:init', () => {
         Alpine.store('animeTransition', {
             animateConfigCompletion(formData) {
+                const text = `Welcome ${formData.username}`.trim();
+                welcomeName.innerHTML = text.split("").map(char => `<span style="display: inline-block; opacity: 0;">${char === " " ? "&nbsp;" : char}</span>`)
+                    .join("");
+
                 anime.timeline({
                     easing: 'easeInOutQuad'
                 })
@@ -179,7 +183,7 @@
                     })
                     .add({
                         targets: [helperText],
-                        duration: 1000,
+                        duration: 500,
                         translateX: '100%',
                         opacity: [1, 0],
                         complete: () => {
@@ -191,7 +195,7 @@
                         top: '-100%',
                         // translateX: ['0%', '100%'],
                         opacity: [1, 0],
-                        duration: 1000,
+                        duration: 500,
                         delay: anime.stagger(100)
                     })
                     .add({
@@ -202,13 +206,14 @@
                         easing: 'easeInOutQuad'
                     })
                     .add({
-                        targets: [welcomeText],
-                        translateY: [50, 0],
+                        targets: ".welcome-text-name span",
+                        translateY: [20, 0],
                         opacity: [0, 1],
-                        duration: 1000,
+                        duration: 100,
+                        delay: anime.stagger(100),
                         begin: () => {
                             welcomeText.style.display = 'flex';
-                            welcomeName.innerHTML = `Welcome ${formData.username}`;
+                            // welcomeName.innerHTML = `Welcome ${formData.username}`;
                         }
                     });
             }
