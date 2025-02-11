@@ -2,10 +2,7 @@
 
 {% block content %}
 <div class="background">
-    <div class="side-nav">
-        {% block sidenav %}
-        {% endblock %}
-    </div>
+    {% include "../sidebar/sidebar.peb" %}
 </div>
 <script>
     const getOSDetails = async () => {

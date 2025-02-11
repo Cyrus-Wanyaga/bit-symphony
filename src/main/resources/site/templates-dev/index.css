@@ -295,4 +295,22 @@ button {
     width: 25%;
     background-color: rgba(0,0,0, 0.5);
     height: 100%;
+    color: white;
+    padding: 32px;
+}
+
+.side-nav h1 {
+    text-align: center;
+    font-weight: bolder;
+    letter-spacing: 5px;
+    font-size: 32px;
+    position: relative;
+}
+
+.side-nav h1::after {
+    position: absolute;
+    content: "";
+    width: inherit;
+    height: 2px;
+    background-color: white;
 }
