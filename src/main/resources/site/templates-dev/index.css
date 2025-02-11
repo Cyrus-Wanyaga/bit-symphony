@@ -96,7 +96,7 @@ h6 {
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    pointer-events: none;
+    /* pointer-events: none; */
 }
 
 .form-area {
