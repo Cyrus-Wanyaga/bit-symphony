@@ -43,7 +43,7 @@ public class DefaultResources {
                 headers.put("Content-Length", String.valueOf(content.length));
 
                 // Add caching headers for static resources
-                headers.put("Cache-Control", "public, max-age=31536000");
+                // headers.put("Cache-Control", "public, max-age=31536000");
 
                 response.setHeaders(headers);
                 response.setBody(content);
