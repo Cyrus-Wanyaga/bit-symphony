@@ -1,3 +1,60 @@
-<div class="side-nav">
-    <h1>BitSymphony</h1>
+<div class="side-nav-title">
+    <p>BitSymphony</p>
+    <!-- <i class="bi bi-arrow-left-right"></i> -->
 </div>
+<div class="side-nav-links">
+    <ul>
+        <li class="side-nav-link">
+            <a href="/">Dashboard</a>
+        </li>
+        <li class="side-nav-link" x-data="{ isOpen: false }">
+            <div class="side-nav-link-parent" @click="isOpen = !isOpen; $animateCaret($refs.caret)">
+                <p>Test Cases</p>
+                <i class="bi bi-caret-up" x-ref="caret"></i>
+            </div>
+            <div class="side-nav-child-links" x-show="isOpen" x-collapse>
+                <a href="/test-cases-data">Test Case Data</a>
+                <a href="/test-cases-files">Test Case Files</a>
+            </div>
+        </li>
+        <li class="side-nav-link" x-data="{ isOpen: false }">
+            <div class="side-nav-link-parent" @click="isOpen = !isOpen; $animateCaret($refs.caret)">
+                <a href="#">Tutorials</a>
+                <i class="bi bi-caret-up" x-ref="caret"></i>
+            </div>
+            <div class="side-nav-child-links" x-show="isOpen" x-collapse>
+                <a href="#">Server I/O</a>
+                <a href="#">File I/O</a>
+                <a href="#">Data Structures</a>
+                <a href="#">Algorithms</a>
+                <a href="#">Java Code</a>
+                <a href="#">Backend Engineering</a>
+                <a href="#">Frontend Engineering</a>
+                <a href="#">Proompt Engineering</a>
+            </div>
+        </li>
+        <li class="side-nav-link" x-data="{ isOpen: false }">
+            <div class="side-nav-link-parent" @click="isOpen = !isOpen; $animateCaret($refs.caret)">
+                <a href="#">Configuration</a>
+                <i class="bi bi-caret-up" x-ref="caret"></i>
+            </div>
+            <div class="side-nav-child-links" x-show="isOpen" x-collapse>
+                <a href="#">Test Case Data</a>
+                <a href="#">Test Case Files</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.magic('animateCaret', () => (el) => {
+            anime({
+                targets: el,
+                rotate: el.style.transform === 'rotate(180deg)' ? 0 : 180,
+                duration: 300,
+                easing: 'easeInOutQuad'
+            });
+        });
+    });
+</script>

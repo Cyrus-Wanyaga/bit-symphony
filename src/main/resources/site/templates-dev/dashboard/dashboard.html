@@ -1,8 +1,14 @@
 {% extends "../index.peb" %}
 
 {% block content %}
-<div class="background">
-    {% include "../sidebar/sidebar.peb" %}
+<div class="dashboard-container">
+    <div class="side-nav">
+        {% include "../sidebar/sidebar.peb" %}
+    </div>
+    <div class="content">
+        {% block dashboardcontent %}
+        {% endblock %}
+    </div>
 </div>
 <script>
     const getOSDetails = async () => {
