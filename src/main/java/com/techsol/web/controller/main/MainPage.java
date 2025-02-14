@@ -11,7 +11,6 @@ import javax.xml.transform.TransformerException;
 import com.techsol.config.Constants;
 import com.techsol.database.dao.ConfigDao;
 import com.techsol.utils.headers.HeaderHelper;
-import com.techsol.utils.transform.IndentHTML;
 import com.techsol.web.annotations.HTTPPath;
 import com.techsol.web.http.HTTPRequest;
 import com.techsol.web.http.HTTPResponse;
@@ -44,8 +43,6 @@ public class MainPage {
 
         String output = writer.toString();
 
-        // IndentHTML.setInput(output);
-        // String indentedOutput = IndentHTML.transformInput();
         httpResponse.setCompressContent(true);
         HeaderHelper.createHtmlResponse(output, httpResponse);
     }
