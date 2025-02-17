@@ -2,45 +2,107 @@
     <p>BitSymphony</p>
     <!-- <i class="bi bi-arrow-left-right"></i> -->
 </div>
-<div class="side-nav-links">
+<div class="side-nav-links" 
+     x-data="{ 
+        activeTab: localStorage.getItem('activeTab') || '/dashboard',
+        openTabs: JSON.parse(localStorage.getItem('openTabs')) || {}  
+     }"
+     x-init="
+        Object.keys(openTabs).forEach(tab => {
+            if (openTabs[tab] && $refs[tab + 'Caret']) {
+                $animateCaret($refs[tab + 'Caret'], true);
+            } else if (openTabs[tab] && tab === 'test-cases') {
+                $animateCaret($refs.testCasesCaret, true);
+            }
+        });
+     ">
     <ul>
+        <!-- Dashboard -->
+        <li class="side-nav-link" :class="{ 'active': activeTab === '/dashboard' }">
+            <a href="/dashboard" 
+               @click="activeTab = '/dashboard'; localStorage.setItem('activeTab', '/dashboard')">
+                Dashboard
+            </a>
+        </li>
+
+        <!-- Test Cases -->
         <li class="side-nav-link">
-            <a href="/">Dashboard</a>
-        </li>
-        <li class="side-nav-link" x-data="{ isOpen: false }">
-            <div class="side-nav-link-parent" @click="isOpen = !isOpen; $animateCaret($refs.caret)">
+            <div class="side-nav-link-parent"
+                 @click="openTabs['test-cases'] = !openTabs['test-cases']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.testCasesCaret, openTabs['test-cases'])">
                 <p>Test Cases</p>
-                <i class="bi bi-caret-up" x-ref="caret"></i>
+                <i class="bi bi-caret-up" x-ref="testCasesCaret"></i>
             </div>
-            <div class="side-nav-child-links" x-show="isOpen" x-collapse>
-                <a href="/test-cases-data">Test Case Data</a>
-                <a href="/test-cases-files">Test Case Files</a>
-            </div>
-        </li>
-        <li class="side-nav-link" x-data="{ isOpen: false }">
-            <div class="side-nav-link-parent" @click="isOpen = !isOpen; $animateCaret($refs.caret)">
-                <a href="#">Tutorials</a>
-                <i class="bi bi-caret-up" x-ref="caret"></i>
-            </div>
-            <div class="side-nav-child-links" x-show="isOpen" x-collapse>
-                <a href="#">Server I/O</a>
-                <a href="#">File I/O</a>
-                <a href="#">Data Structures</a>
-                <a href="#">Algorithms</a>
-                <a href="#">Java Code</a>
-                <a href="#">Backend Engineering</a>
-                <a href="#">Frontend Engineering</a>
-                <a href="#">Proompt Engineering</a>
+            <div class="side-nav-child-links" x-show="openTabs['test-cases']" x-collapse>
+                <a href="/test-cases-data"
+                   @click="activeTab = '/test-cases'; localStorage.setItem('activeTab', '/test-cases')">
+                   Test Case Data
+                </a>
+                <a href="/test-cases-files"
+                   @click="activeTab = '/test-cases'; localStorage.setItem('activeTab', '/test-cases')">
+                   Test Case Files
+                </a>
             </div>
         </li>
-        <li class="side-nav-link" x-data="{ isOpen: false }">
-            <div class="side-nav-link-parent" @click="isOpen = !isOpen; $animateCaret($refs.caret)">
-                <a href="#">Configuration</a>
-                <i class="bi bi-caret-up" x-ref="caret"></i>
+
+        <!-- Tutorials -->
+        <li class="side-nav-link">
+            <div class="side-nav-link-parent"
+                 @click="openTabs['tutorials'] = !openTabs['tutorials']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.tutorialsCaret, openTabs['tutorials'])">
+                <p>Tutorials</p>
+                <i class="bi bi-caret-up" x-ref="tutorialsCaret"></i>
             </div>
-            <div class="side-nav-child-links" x-show="isOpen" x-collapse>
-                <a href="#">Test Case Data</a>
-                <a href="#">Test Case Files</a>
+            <div class="side-nav-child-links" x-show="openTabs['tutorials']" x-collapse>
+                <a href="/tutorials/server-io"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Server I/O
+                </a>
+                <a href="/tutorials/file-io"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   File I/O
+                </a>
+                <a href="/tutorials/data-structures"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Data Structures
+                </a>
+                <a href="/tutorials/algorithms"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Algorithms
+                </a>
+                <a href="/tutorials/java-code"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Java Code
+                </a>
+                <a href="/tutorials/backend-engineering"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Backend Engineering
+                </a>
+                <a href="/tutorials/frontend-engineering"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Frontend Engineering
+                </a>
+                <a href="/tutorials/proompt-engineering"
+                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
+                   Proompt Engineering
+                </a>
+            </div>
+        </li>
+
+        <!-- Configuration -->
+        <li class="side-nav-link">
+            <div class="side-nav-link-parent"
+                 @click="openTabs['configuration'] = !openTabs['configuration']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.configurationCaret, openTabs['configuration'])">
+                <p>Configuration</p>
+                <i class="bi bi-caret-up" x-ref="configurationCaret"></i>
+            </div>
+            <div class="side-nav-child-links" x-show="openTabs['configuration']" x-collapse>
+                <a href="/configuration/app-settings"
+                   @click="activeTab = '/configuration'; localStorage.setItem('activeTab', '/configuration')">
+                   App Settings
+                </a>
+                <a href="/configuration/site-settings"
+                   @click="activeTab = '/configuration'; localStorage.setItem('activeTab', '/configuration')">
+                   Site Settings
+                </a>
             </div>
         </li>
     </ul>
@@ -48,10 +110,10 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.magic('animateCaret', () => (el) => {
+        Alpine.magic('animateCaret', () => (el, isOpen) => {
             anime({
                 targets: el,
-                rotate: el.style.transform === 'rotate(180deg)' ? 0 : 180,
+                rotate: isOpen ? 180 : 0,  // Rotate to 180 when open, back to 0 when closed
                 duration: 300,
                 easing: 'easeInOutQuad'
             });

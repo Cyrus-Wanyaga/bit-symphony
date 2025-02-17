@@ -6,8 +6,12 @@
         {% include "../sidebar/sidebar.peb" %}
     </div>
     <div class="content">
-        {% block dashboardcontent %}
-        {% endblock %}
+        {% if requestPath == "/dashboard" %}
+            <h3>Dashboard</h3>
+        {% else %}
+            {% block dashboardcontent %}
+            {% endblock %}
+        {% endif %}
     </div>
 </div>
 <script>

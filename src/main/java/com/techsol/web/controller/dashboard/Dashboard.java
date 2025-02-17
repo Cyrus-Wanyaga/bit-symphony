@@ -32,6 +32,7 @@ public class Dashboard {
         Map<String, Object> context = new HashMap<>();
         context.put("websiteTitle", "Wow...this is nice");
         context.put("users", users);
+        context.put("requestPath", request.getUrl());
 
         Writer writer = new StringWriter();
         template.evaluate(writer, context);
