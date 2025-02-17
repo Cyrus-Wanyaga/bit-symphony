@@ -26,7 +26,8 @@
         </li>
 
         <!-- Test Cases -->
-        <li class="side-nav-link">
+        <li class="side-nav-link"
+            :class="{ 'active': activeTab === '/test-cases' }">
             <div class="side-nav-link-parent"
                  @click="openTabs['test-cases'] = !openTabs['test-cases']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.testCasesCaret, openTabs['test-cases'])">
                 <p>Test Cases</p>
