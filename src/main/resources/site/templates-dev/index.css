@@ -4,6 +4,7 @@
     --primary-color: #fa807c;
     --primary-color-hex: 250, 128, 124;
     --secondary-color: #02ae8e;
+    --secondary-color-hex: 2,174,142;
     --accent-color: #dcf513;
     --text-color: #ffe4e4;
 }
@@ -329,7 +330,7 @@ button {
 .dashboard-container {
     display: flex;
     background: rgb(15, 15, 15);
-    background: linear-gradient(0deg, rgba(15, 15, 15, 1) 0%, rgba(13, 13, 13, 0.8001401244091386) 100%);
+    /* background: linear-gradient(0deg, rgba(15, 15, 15, 1) 0%, rgba(13, 13, 13, 0.8001401244091386) 100%); */
     min-height: 100vh;
 }
 
@@ -338,4 +339,26 @@ button {
     flex-direction: column;
     color: white;
     padding: 32px;
+    width: 100%;
+}
+
+.upper-dashboard-cards {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    display: flex;
+    width: 100%;
+}
+
+.dashboard-card {
+    background-color: rgba(var(--secondary-color-hex), 0.8);
+    padding: 32px;
+    width: 50%;
+}
+
+.dashboard-card:nth-child(1) {
+    margin-right: 16px;
+}
+
+.dashboard-card:nth-child(2) {
+    margin-left: 16px;
 }

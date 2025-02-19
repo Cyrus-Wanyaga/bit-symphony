@@ -8,6 +8,18 @@
     <div class="content">
         {% if requestPath == "/dashboard" %}
             <h3>Dashboard</h3>
+            <div class="upper-dashboard-cards">
+                <div class="dashboard-card">
+                    <p>Tests</p>
+                    <p>75</p>
+                    <p>15</p>
+                </div>
+                <div class="dashboard-card">
+                    <p>Tests</p>
+                    <p>75</p>
+                    <p>15</p>
+                </div>
+            </div>
         {% else %}
             {% block dashboardcontent %}
             {% endblock %}
