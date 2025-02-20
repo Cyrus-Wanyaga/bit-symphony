@@ -1,11 +1,15 @@
 {
-    "name": "file-watcher",
+    "name": "bit-symphony",
     "version": "1.0.0",
-    "description": "File watcher for HTML directory",
-    "main": "filewatcher.js",
+    "description": "All about those bits, bits, bits",
     "dependencies": {
+        "bit-symphony": "file:",
         "chokidar": "^4.0.3",
         "file-watcher": "file:",
         "ws": "^8.18.0"
+    },
+    "scripts": {
+        "start:filewatcher": "node filewatcher.js",
+        "start:node-server": "node node-server.js"
     }
 }

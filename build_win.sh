@@ -57,12 +57,15 @@ if [[ "${DEV_MODE}" == "true" ]] || [[ "$1" == "--dev" ]]; then
         $java_custom -Ddev.mode=true -cp "bin;lib/*;src/main/resources" com.techsol.Main &
         JAVA_PID=$!
 
-        sleep 2
+        sleep 15
 
         echo "Starting Node.js file watcher..."
         # Start Node.js watcher in background
         node filewatcher.js "${HTML_DIR}" "${PEB_DIR}" &
         NODE_PID=$!
+
+        node node-server.js &
+        NODE_PID_1=$!
 
         trap "echo 'Shutting down processes...'; kill $JAVA_PID $NODE_PID; exit" SIGINT SIGTERM
 
@@ -70,7 +73,7 @@ if [[ "${DEV_MODE}" == "true" ]] || [[ "$1" == "--dev" ]]; then
         wait $JAVA_PID $NODE_PID
 
         # Clean up any remaining processes
-        kill $JAVA_PID $NODE_PID 2>/dev/null
+        kill $JAVA_PID $NODE_PID $NODE_PID_1 2>/dev/null
     else
         echo "Falling back to Java implementation..."
         $java_custom -Ddev.mode=true -cp "bin;lib/*;src/main/resources" com.techsol.Main

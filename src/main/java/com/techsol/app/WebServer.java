@@ -288,7 +288,6 @@ public class WebServer {
     protected void handleWebSocketRequest(SocketChannel clientChannel, ByteBuffer buffer) {
         WebsocketHandler handler = WebSocketHandlers.getWebSocketHandlers().get(clientChannel);
         if (handler != null) {
-            System.out.println(handler.getClass().getName());
             handler.onMessage(buffer);
         }
     }

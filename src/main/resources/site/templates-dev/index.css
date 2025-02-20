@@ -350,7 +350,7 @@ button {
 }
 
 .dashboard-card {
-    background-color: rgba(var(--secondary-color-hex), 0.8);
+    background-color: wheat;
     padding: 32px;
     width: 50%;
 }
@@ -361,4 +361,5 @@ button {
 
 .dashboard-card:nth-child(2) {
     margin-left: 16px;
+    background-color: white;
 }

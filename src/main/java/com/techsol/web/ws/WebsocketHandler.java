@@ -141,7 +141,6 @@ public class WebsocketHandler {
     }
 
     public void broadcast(String message) {
-        System.out.println("Attempting to broadcast");
         for (Map.Entry<SocketChannel, WebsocketHandler> entry : WebSocketHandlers.getWebSocketHandlers().entrySet()) {
             if (entry.getKey() != clientChannel) {
                 entry.getValue().sendMessage(message);
