@@ -329,7 +329,8 @@ button {
 
 .dashboard-container {
     display: flex;
-    background: rgb(15, 15, 15);
+    /* background: rgb(15, 15, 15); */
+    background-color: #F9F9F9;
     /* background: linear-gradient(0deg, rgba(15, 15, 15, 1) 0%, rgba(13, 13, 13, 0.8001401244091386) 100%); */
     min-height: 100vh;
 }
@@ -337,8 +338,8 @@ button {
 .content {
     display: flex;
     flex-direction: column;
-    color: white;
-    padding: 32px;
+    /* color: white; */
+    /* padding: 32px; */
     width: 100%;
 }
 
@@ -362,4 +363,77 @@ button {
 .dashboard-card:nth-child(2) {
     margin-left: 16px;
     background-color: white;
+}
+
+.search-header, .search-content {
+    display: flex;
+}
+
+.search-header {
+    height: 68px;
+    align-items: center;
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+.search-content {
+    width: 60%;
+    background-color: #F6F6FB;
+    padding: 16px;
+    border-radius: 5px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: rgba(31, 56, 76, .3);
+    transition: all .5s ease-in;
+}
+
+.search-content:hover {
+    color: rgba(31, 56, 76, 1);
+}
+
+.search-content i {
+    cursor: pointer;
+}
+
+.search-separator {
+    width: 100%;
+    height: 1px;
+    background-color: #C8CBD9;
+}
+
+.inner-content-container {
+    padding: 16px 32px 0 32px;
+}
+
+.top-dashboard-section {
+    display: flex;
+}
+
+.analytics-card-containers {
+    display: flex;
+    margin-top: 16px;
+    width: 60%;
+}
+
+.analytics-card {
+    background-color: white;
+    padding: 16px;
+    min-height: 120px;
+    border-radius: 5px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.analytics-card:not(:first-child) {
+    margin-left: 16px;
+}
+
+.analytics-card-title {
+    font-size: 16px;
+}
+
+.analytics-card-content {
+    font-weight: bold;
+    margin-top: 16px;
 }

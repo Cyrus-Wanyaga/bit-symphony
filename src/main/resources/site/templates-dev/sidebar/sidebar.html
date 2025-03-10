@@ -2,6 +2,7 @@
     <p>BitSymphony</p>
     <!-- <i class="bi bi-arrow-left-right"></i> -->
 </div>
+<div class="separator"></div>
 <div class="side-nav-links" 
      x-data="{ 
         activeTab: localStorage.getItem('activeTab') || '/dashboard',
@@ -31,7 +32,7 @@
             <div class="side-nav-link-parent"
                  @click="openTabs['test-cases'] = !openTabs['test-cases']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.testCasesCaret, openTabs['test-cases'])">
                 <p>Test Cases</p>
-                <i class="bi bi-caret-up" x-ref="testCasesCaret"></i>
+                <i class="bi bi-chevron-right" x-ref="testCasesCaret"></i>
             </div>
             <div class="side-nav-child-links" x-show="openTabs['test-cases']" x-collapse>
                 <a href="/test-cases-data"
@@ -50,7 +51,7 @@
             <div class="side-nav-link-parent"
                  @click="openTabs['tutorials'] = !openTabs['tutorials']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.tutorialsCaret, openTabs['tutorials'])">
                 <p>Tutorials</p>
-                <i class="bi bi-caret-up" x-ref="tutorialsCaret"></i>
+                <i class="bi bi-chevron-right" x-ref="tutorialsCaret"></i>
             </div>
             <div class="side-nav-child-links" x-show="openTabs['tutorials']" x-collapse>
                 <a href="/tutorials/server-io"
@@ -93,7 +94,7 @@
             <div class="side-nav-link-parent"
                  @click="openTabs['configuration'] = !openTabs['configuration']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.configurationCaret, openTabs['configuration'])">
                 <p>Configuration</p>
-                <i class="bi bi-caret-up" x-ref="configurationCaret"></i>
+                <i class="bi bi-chevron-right" x-ref="configurationCaret"></i>
             </div>
             <div class="side-nav-child-links" x-show="openTabs['configuration']" x-collapse>
                 <a href="/configuration/app-settings"
@@ -114,7 +115,7 @@
         Alpine.magic('animateCaret', () => (el, isOpen) => {
             anime({
                 targets: el,
-                rotate: isOpen ? 180 : 0,  // Rotate to 180 when open, back to 0 when closed
+                rotate: isOpen ? 90 : 0,  // Rotate to 180 when open, back to 0 when closed
                 duration: 300,
                 easing: 'easeInOutQuad'
             });

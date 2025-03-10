@@ -6,24 +6,50 @@
         {% include "../sidebar/sidebar.peb" %}
     </div>
     <div class="content">
-        {% if requestPath == "/dashboard" %}
-            <h3>Dashboard</h3>
-            <div class="upper-dashboard-cards">
-                <div class="dashboard-card">
-                    <p>Tests</p>
-                    <p>75</p>
-                    <p>15</p>
-                </div>
-                <div class="dashboard-card">
-                    <p>Tests</p>
-                    <p>75</p>
-                    <p>15</p>
+
+        <div class="search-header">
+            <div class="search-content">
+                <p class="">Search</p>
+                <i class="bi bi-search"></i>
+            </div>
+        </div>
+        <div class="search-separator"></div>
+        <div class="inner-content-container">
+            {% if requestPath == "/dashboard" %}
+            <h4>Dashboard</h4>
+            <div class="top-dashboard-section">
+                <div class="analytics-card-containers">
+                    <div class="analytics-card">
+                        <p class="analytics-card-title">Total Test Cases</p>
+                        <p class="analytics-card-content">86</p>
+                    </div>
+                    <div class="analytics-card">
+                        <p class="analytics-card-title">Total Test Files</p>
+                        <p class="analytics-card-content">15</p>
+                    </div>
+                    <div class="analytics-card">
+                        <p class="analytics-card-title">Total Test Cases</p>
+                        <p class="analytics-card-content">86</p>
+                    </div>
+                    <div class="analytics-card">
+                        <p class="analytics-card-title">Total Test Cases</p>
+                        <p class="analytics-card-content">86</p>
+                    </div>
+                    <div class="analytics-card">
+                        <p class="analytics-card-title">Total Test Cases</p>
+                        <p class="analytics-card-content">86</p>
+                    </div>
+                    <div class="analytics-card">
+                        <p class="analytics-card-title">Total Test Cases</p>
+                        <p class="analytics-card-content">86</p>
+                    </div>
                 </div>
             </div>
-        {% else %}
+            {% else %}
             {% block dashboardcontent %}
             {% endblock %}
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 </div>
 <script>

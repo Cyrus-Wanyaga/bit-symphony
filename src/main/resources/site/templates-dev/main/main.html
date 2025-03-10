@@ -79,7 +79,7 @@
                 <input x-show="step > 3" x-model="formData.testIntervalTime" placeholder="Test Interval Time"
                     class="additional-inputs" type="number" default="{{ configs.test_interval }}" tabindex="1"></input>
             </div>
-            <button x-show="step < 4" @click="nextStep" type="button" class="draw-border">Continue</button>
+            <button x-show="step < 4" @click="nextStep" type="button"   >Continue</button>
             <button x-show="isLastStep" @click="submitConfig" type="button" class="draw-border">Finish</button>
             <button x-show="step > 1" @click="prevStep" type="button" class="draw-border draw-border-back">Back</button>
         </div>
