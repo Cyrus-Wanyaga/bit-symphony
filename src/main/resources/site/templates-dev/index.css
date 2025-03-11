@@ -411,10 +411,24 @@ button {
     display: flex;
 }
 
+.quick-stats {
+    width: 70%;
+}
+
+.top-tests {
+    width: 30%;
+    margin-left: 32px;
+}
+
+.quick-stats h6, .top-tests h6 {
+    padding: 16px 0; 
+}
+
 .analytics-card-containers {
-    display: flex;
-    margin-top: 16px;
-    width: 60%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+    gap: 16px;
+    align-items: stretch;
 }
 
 .analytics-card {
@@ -422,11 +436,14 @@ button {
     padding: 16px;
     min-height: 120px;
     border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
 .analytics-card:not(:first-child) {
-    margin-left: 16px;
+    /* margin-left: 16px; */
 }
 
 .analytics-card-title {
