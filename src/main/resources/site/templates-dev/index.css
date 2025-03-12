@@ -378,20 +378,21 @@ button {
 
 .search-content {
     width: 60%;
-    background-color: #F6F6FB;
+    background-color: #707FDD;
     padding: 16px;
     border-radius: 5px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: rgba(31, 56, 76, .3);
+    /* color: rgba(31, 56, 76, .3); */
+    color: white;
     transition: all .5s ease-in;
 }
 
-.search-content:hover {
+/* .search-content:hover {
     color: rgba(31, 56, 76, 1);
-}
+} */
 
 .search-content i {
     cursor: pointer;
@@ -418,6 +419,13 @@ button {
 .top-tests {
     width: 30%;
     margin-left: 32px;
+}
+
+.top-tests-card-section {
+    /* max-height: 256px;
+    height: 256px;
+    overflow-y: scroll;
+    scrollbar-width: none; */
 }
 
 .quick-stats h6, .top-tests h6 {
@@ -453,4 +461,53 @@ button {
 .analytics-card-content {
     font-weight: bold;
     margin-top: 16px;
+    font-size: 32px;
+    color: #C8CBD9;
+}
+
+.top-test-card {
+    background-color: white;
+    padding: 16px;
+    display: flex;
+    border-radius: 5px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.top-test-card:not(:first-of-type) {
+    margin-top: 16px;
+}
+
+.count-and-title {
+    display: flex;
+    align-items: center;
+}
+
+.count-bg, .action-bg {
+    width: 32px;
+    height: 32px;
+    background-color: #98dc8b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+}
+
+.count-bg p {
+    font-size: 14px;
+    /* font-weight: 600; */
+    color: white;
+}
+
+.action-bg {
+    justify-self: flex-end;
+}
+
+.action-bg i {
+    color: white;
+}
+
+.top-test-card-title {
+    margin-left: 16px;
 }

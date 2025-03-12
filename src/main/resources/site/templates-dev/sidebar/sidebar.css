@@ -70,7 +70,8 @@
 
 .side-nav-link.active {
     /* background-color: var(--primary-color) !important; */
-    background-color: #707FDD;
+    /* background-color: #707FDD; */
+    background-color: #3d4ba0;
     transition: .5s ease-in;
 }
 
@@ -84,7 +85,7 @@
 
 .side-nav-link:hover {
     /* background-color: var(--primary-color) !important; */
-    background-color: #707FDD;
+    background-color: #3d4ba0;
     transition: .5s ease-in;
     /* color: black; */
 }

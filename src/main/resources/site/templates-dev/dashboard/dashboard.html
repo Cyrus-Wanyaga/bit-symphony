@@ -49,6 +49,21 @@
                 </div>
                 <div class="top-tests">
                     <h6>Top Tests</h6>
+                    <div class="top-tests-card-section">
+                        {% for i in 1..5 %}
+                        <div class="top-test-card">
+                            <div class="count-and-title">
+                                <div class="count-bg">
+                                    <p>{{ i }}</p>
+                                </div>
+                                <p class="top-test-card-title">Test Case Title {{ i }}</p>
+                            </div>
+                            <div class="action-bg">
+                                <i class="bi bi-play"></i>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
             {% else %}
@@ -73,5 +88,21 @@
     };
 
     getOSDetails();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const analyticsSection = document.querySelector('.analytics-card-containers');
+        const topTestsSection = document.querySelector('.top-tests-card-section');
+
+        function setTopTestsHeight() {
+            if (analyticsSection && topTestsSection) {
+                const analyticsHeight = analyticsSection.offsetHeight;
+                topTestsSection.style.height = analyticsHeight + 'px';
+            }
+        }
+
+        // Initial set and resize listener
+        setTopTestsHeight();
+        window.addEventListener('resize', setTopTestsHeight);
+    });
 </script>
 {% endblock %}
