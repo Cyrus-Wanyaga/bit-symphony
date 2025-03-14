@@ -30,20 +30,24 @@
                             <p class="analytics-card-content">15</p>
                         </div>
                         <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Cases</p>
-                            <p class="analytics-card-content">86</p>
+                            <p class="analytics-card-title">Total Test Files Size</p>
+                            <p class="analytics-card-content">150 MB</p>
                         </div>
                         <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Cases</p>
-                            <p class="analytics-card-content">86</p>
+                            <p class="analytics-card-title">Total Test Time</p>
+                            <p class="analytics-card-content">1300 min</p>
                         </div>
                         <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Cases</p>
-                            <p class="analytics-card-content">86</p>
+                            <p class="analytics-card-title">Average Test Time</p>
+                            <p class="analytics-card-content">50 sec</p>
                         </div>
                         <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Cases</p>
-                            <p class="analytics-card-content">86</p>
+                            <p class="analytics-card-title">Longest Test Time</p>
+                            <p class="analytics-card-content">300 sec</p>
+                        </div>
+                        <div class="analytics-card">
+                            <p class="analytics-card-title">Shortest Test Time</p>
+                            <p class="analytics-card-content">100 m.sec</p>
                         </div>
                     </div>
                 </div>
@@ -96,7 +100,7 @@
         function setTopTestsHeight() {
             if (analyticsSection && topTestsSection) {
                 const analyticsHeight = analyticsSection.offsetHeight;
-                topTestsSection.style.height = analyticsHeight + 'px';
+                topTestsSection.style.height = (analyticsHeight + 0) + 'px';
             }
         }
 

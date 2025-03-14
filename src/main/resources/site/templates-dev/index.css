@@ -418,18 +418,25 @@ button {
 
 .top-tests {
     width: 30%;
-    margin-left: 32px;
+    /* margin-left: 32px; */
 }
 
 .top-tests-card-section {
-    /* max-height: 256px;
-    height: 256px;
     overflow-y: scroll;
-    scrollbar-width: none; */
+    scrollbar-width: none;
+    padding-left: 32px;
+    padding-right: 32px;
+    margin-right: -32px;
+    padding-bottom: 32px;
+    margin-bottom: -32px;
 }
 
 .quick-stats h6, .top-tests h6 {
     padding: 16px 0; 
+}
+
+.top-tests h6 {
+    padding-left: 32px;
 }
 
 .analytics-card-containers {
@@ -470,7 +477,8 @@ button {
     padding: 16px;
     display: flex;
     border-radius: 5px;
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    /* box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px; */
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     align-items: center;
     justify-content: space-between;
 }
@@ -502,6 +510,7 @@ button {
 
 .action-bg {
     justify-self: flex-end;
+    cursor: pointer;
 }
 
 .action-bg i {
