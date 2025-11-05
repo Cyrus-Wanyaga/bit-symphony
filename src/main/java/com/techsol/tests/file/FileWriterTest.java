@@ -1,4 +1,4 @@
-package com.techsol.fileio;
+package com.techsol.tests.file;
 
 import java.io.BufferedWriter;
 import java.nio.file.Files;
