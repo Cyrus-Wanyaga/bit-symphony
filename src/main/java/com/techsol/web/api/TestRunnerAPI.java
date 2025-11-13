@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.techsol.database.dao.TestSessionDao;
+import com.techsol.models.TestSession;
 import com.techsol.tests.PerformanceResult;
 import com.techsol.tests.TestResourceMonitor;
 import com.techsol.tests.computation.ComputationPerformanceTest;
@@ -19,6 +21,7 @@ import com.techsol.utils.headers.HeaderHelper;
 import com.techsol.web.annotations.HTTPPath;
 import com.techsol.web.http.HTTPRequest;
 import com.techsol.web.http.HTTPResponse;
+import com.techsol.web.http.HTTPStatusCode;
 
 public class TestRunnerAPI {
     private final TestResourceMonitor resourceMonitor = new TestResourceMonitor();
@@ -55,30 +58,77 @@ public class TestRunnerAPI {
         JSONObject responseObject = new JSONObject();
 
         Path tmpDir = Paths.get("output");
-        if (!Files.exists(tmpDir))
+        if (!Files.exists(tmpDir)) {
             Files.createDirectories(tmpDir);
+        }
 
         boolean chunked = requestObject.getBoolean("chunked");
         int chunkSize = requestObject.getInt("chunkSize");
+        int testRepetitions = requestObject.getInt("testRepetitions");
         String fileName = "Write_" + (chunked ? "chunked" : "full") + ".txt";
-        FileWriterTest fileWriterTest = new FileWriterTest(1_000, chunked, chunkSize, tmpDir.resolve(fileName));
 
-        System.out.println("Running: " + fileWriterTest.getName());
-        PerformanceResult result = fileWriterTest.runTest(resourceMonitor);
-        JSONObject testResultObject = new JSONObject();
-        testResultObject.put("testName", result.getTestName());
-        testResultObject.put("durationInMillis", result.getDurationMillis());
-        testResultObject.put("fileSize", result.getMetrics().get("fileSizeBytes"));
-        testResultObject.put("memoryUsed", result.getMetrics().get("memoryUsedBytes"));
-        responseObject.put("result", testResultObject);
+        TestSession testSession = new TestSession();
+        testSession.setTestGroup("Write To File");
+        testSession.setDescription("Write to a file with n number of integers");
+        testSession.setTotalRuns(0);
 
+        int testSessionId = TestSessionDao.createTestSession(testSession);
+        if (testSessionId <= 0) {
+            responseObject.put("message", "Failed to create test session");
+            HeaderHelper.createJsonResponse(responseObject.toString(), response);
+            response.setStatusCode(HTTPStatusCode.INTERNAL_SERVER_ERROR.getStatusCode());
+            response.setOk(false);
+            return;
+        }
+
+        JSONArray testResultsArray = new JSONArray();
+        if (testRepetitions > 0) {
+            for (int i = 0; i < testRepetitions; i++) {
+                String newFileName = chunked ? fileName.replace("chunked.txt", "chunked_" + i + ".txt") : fileName.replace("full.txt", "full_" + i + ".txt");
+                FileWriterTest fileWriterTest = new FileWriterTest(100_000, chunked, chunkSize,
+                        tmpDir.resolve(newFileName),
+                        testSessionId);
+
+                System.out.println("Running: " + fileWriterTest.getName());
+
+                PerformanceResult result = fileWriterTest.runTest(resourceMonitor);
+                if (result == null) {
+                    return;
+                }
+                JSONObject testResultObject = new JSONObject();
+                testResultObject.put("testName", result.getTestName());
+                testResultObject.put("durationInMillis", result.getDurationMillis());
+                testResultObject.put("fileSize", result.getMetrics().get("fileSizeBytes"));
+                testResultObject.put("memoryUsed", result.getMetrics().get("memoryUsedBytes"));
+                testResultObject.put("testIndex", i);
+                testResultsArray.put(testResultObject);
+            }
+        } else {
+            FileWriterTest fileWriterTest = new FileWriterTest(100_000, chunked, chunkSize, tmpDir.resolve(fileName),
+                    testSessionId);
+
+            System.out.println("Running: " + fileWriterTest.getName());
+
+            PerformanceResult result = fileWriterTest.runTest(resourceMonitor);
+            if (result == null) {
+                return;
+            }
+            JSONObject testResultObject = new JSONObject();
+            testResultObject.put("testName", result.getTestName());
+            testResultObject.put("durationInMillis", result.getDurationMillis());
+            testResultObject.put("fileSize", result.getMetrics().get("fileSizeBytes"));
+            testResultObject.put("memoryUsed", result.getMetrics().get("memoryUsedBytes"));
+            testResultObject.put("testIndex", 0);
+            testResultsArray.put(testResultObject);
+        }
+
+        responseObject.put("result", testResultsArray);
         HeaderHelper.createJsonResponse(responseObject.toString(), response);
     }
 
     @HTTPPath(path = "/api/tests/readFromFile")
     public void readFromFileTest(HTTPRequest request, HTTPResponse response) throws Exception {
         String requestBodyString = new String(request.getBody(), StandardCharsets.UTF_8);
-        System.out.println("Processing request: " + requestBodyString);
         JSONObject requestObject = new JSONObject(requestBodyString);
         JSONObject responseObject = new JSONObject();
 
