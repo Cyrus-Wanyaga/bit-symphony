@@ -1,10 +1,14 @@
 package com.techsol;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import com.techsol.app.LoadBalancedWebServer;
 import com.techsol.database.DatabaseManager;
 import com.techsol.database.dao.ConfigDao;
+import com.techsol.web.http.HTTPRequest;
+import com.techsol.web.http.HTTPResponse;
+import com.techsol.web.routes.RouteRegistry;
 import com.techsol.web.server.BackendRegistry;
 import com.techsol.web.server.HealthChecker;
 import com.techsol.web.templateengine.PebbleEngineProvider;
@@ -45,6 +49,19 @@ public class Main {
         if (pebbleEngine != null) {
             System.out.println("Initialized Pebble Template Engine");
         }
+
+        System.out.println("Registering application routes");
+
+        Map<String, BiConsumer<HTTPRequest, HTTPResponse>> routes = RouteRegistry.ROUTES;
+
+        if (routes.isEmpty()) {
+            System.out.println("No routes found.");
+        } else {
+            for (String path : routes.keySet()) {
+                System.out.println(" -> Mapped [" + path + "]");
+            }
+        }
+        System.out.println("Route registration complete.");
 
         // Executor executor = Executors.newSingleThreadExecutor();
         // executor.execute(() -> {
