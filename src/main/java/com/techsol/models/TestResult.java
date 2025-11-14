@@ -6,28 +6,35 @@ public class TestResult {
     private String algorithmName;
     private String startTime;
     private String endTime;
+    private int chunkedRead;
+    private int chunkedWrite;
     private double durationMs;
     private double cpuUsage;
     private long memoryUsage;
     private double diskIO;
     private String extraInfo;
     private int sessionId;
+    private int fileId;
 
     public TestResult() {
     }
 
-    public TestResult(String testName, String algorithmName, String startTime, String endTime,
-            double durationMs, double cpuUsage, long memoryUsage, double diskIO, String extraInfo, int sessionId) {
+    public TestResult(String testName, String algorithmName, String startTime, String endTime, int chunkedRead,
+            int chunkedWrite, double durationMs, double cpuUsage, long memoryUsage, double diskIO, String extraInfo,
+            int sessionId, int fileId) {
         this.testName = testName;
         this.algorithmName = algorithmName;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.chunkedRead = chunkedRead;
+        this.chunkedWrite = chunkedWrite;
         this.durationMs = durationMs;
         this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
         this.diskIO = diskIO;
         this.extraInfo = extraInfo;
         this.sessionId = sessionId;
+        this.fileId = fileId;
     }
 
     public int getId() {
@@ -68,6 +75,22 @@ public class TestResult {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public int getChunkedRead() {
+        return chunkedRead;
+    }
+
+    public void setChunkedRead(int chunkedRead) {
+        this.chunkedRead = chunkedRead;
+    }
+
+    public int getChunkedWrite() {
+        return chunkedWrite;
+    }
+
+    public void setChunkedWrite(int chunkedWrite) {
+        this.chunkedWrite = chunkedWrite;
     }
 
     public double getDurationMs() {
@@ -116,6 +139,14 @@ public class TestResult {
 
     public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public int getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(int fileId) {
+        this.fileId = fileId;
     }
 
 }

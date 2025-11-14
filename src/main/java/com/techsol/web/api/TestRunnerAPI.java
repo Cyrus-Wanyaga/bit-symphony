@@ -7,8 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.techsol.database.dao.ConfigDao;
 import com.techsol.database.dao.TestSessionDao;
 import com.techsol.models.TestSession;
 import com.techsol.tests.PerformanceResult;
@@ -17,6 +19,7 @@ import com.techsol.tests.computation.ComputationPerformanceTest;
 import com.techsol.tests.computation.ComputationPerformanceTest.Mode;
 import com.techsol.tests.file.FileReaderTest;
 import com.techsol.tests.file.FileWriterTest;
+import com.techsol.utils.directory.DirectoryManager;
 import com.techsol.utils.headers.HeaderHelper;
 import com.techsol.web.annotations.HTTPPath;
 import com.techsol.web.http.HTTPRequest;
@@ -53,41 +56,69 @@ public class TestRunnerAPI {
 
     @HTTPPath(path = "/api/tests/writeToFile")
     public void writeToFileTest(HTTPRequest request, HTTPResponse response) throws Exception {
-        String requestBodyString = new String(request.getBody(), StandardCharsets.UTF_8);
-        JSONObject requestObject = new JSONObject(requestBodyString);
-        JSONObject responseObject = new JSONObject();
+        try {
+            String requestBodyString = new String(request.getBody(), StandardCharsets.UTF_8);
+            System.out.println("Request body: " + requestBodyString);
+            JSONObject requestObject = new JSONObject(requestBodyString);
+            JSONObject responseObject = new JSONObject();
 
-        Path tmpDir = Paths.get("output");
-        if (!Files.exists(tmpDir)) {
-            Files.createDirectories(tmpDir);
-        }
+            String defaultDirectory = ConfigDao.getDefaultDirectory();
+            System.out.println("The default directory is: " + defaultDirectory);
 
-        boolean chunked = requestObject.getBoolean("chunked");
-        int chunkSize = requestObject.getInt("chunkSize");
-        int testRepetitions = requestObject.getInt("testRepetitions");
-        String fileName = "Write_" + (chunked ? "chunked" : "full") + ".txt";
+            Path tmpDir = Paths.get(defaultDirectory.isBlank() ? "output" : defaultDirectory);
+            if (!Files.exists(tmpDir)) {
+                Files.createDirectories(tmpDir);
+            }
 
-        TestSession testSession = new TestSession();
-        testSession.setTestGroup("Write To File");
-        testSession.setDescription("Write to a file with n number of integers");
-        testSession.setTotalRuns(0);
+            String sizethresholdMB = ConfigDao.getDirectoryMaxSize();
+            if (sizethresholdMB.isEmpty() || sizethresholdMB.isBlank()) {
+                responseObject.put("message", "Output directory missing size threshold");
+                HeaderHelper.createJsonResponse(responseObject.toString(), response);
+                response.setStatusCode(HTTPStatusCode.INTERNAL_SERVER_ERROR.getStatusCode());
+                response.setOk(false);
+                return;
+            }
 
-        int testSessionId = TestSessionDao.createTestSession(testSession);
-        if (testSessionId <= 0) {
-            responseObject.put("message", "Failed to create test session");
-            HeaderHelper.createJsonResponse(responseObject.toString(), response);
-            response.setStatusCode(HTTPStatusCode.INTERNAL_SERVER_ERROR.getStatusCode());
-            response.setOk(false);
-            return;
-        }
+            long sizeThresholdBytes = Long.valueOf(sizethresholdMB.replace("MB", "")) * 1024 * 1024;
 
-        JSONArray testResultsArray = new JSONArray();
-        if (testRepetitions > 0) {
+            DirectoryManager.DirectoryCleanupResult dirInfo = DirectoryManager.manageOutputDirectory(tmpDir,
+                    sizeThresholdBytes);
+            System.out.println("DirInfo: " + dirInfo.getNextFileIndex());
+            int startIndex = dirInfo.getNextFileIndex();
+
+            boolean chunked = requestObject.getBoolean("chunked");
+            int chunkSize = requestObject.getInt("chunkSize");
+            int testRepetitions = requestObject.getInt("testRepetitions");
+            int numberOfItems = requestObject.getInt("numberOfItems");
+            String dataType = requestObject.getString("dataType");
+            String fileName = "Write_" + (chunked ? "chunked" : "full") + ".txt";
+
+            TestSession testSession = new TestSession();
+            testSession.setTestGroup("Write To File");
+            testSession.setDescription(
+                    "Write to a file with " + numberOfItems + (dataType.equals("text") ? " words" : " numbers"));
+            testSession.setTotalRuns(testRepetitions);
+
+            int testSessionId = TestSessionDao.createTestSession(testSession);
+            if (testSessionId <= 0) {
+                responseObject.put("message", "Failed to create test session");
+                HeaderHelper.createJsonResponse(responseObject.toString(), response);
+                response.setStatusCode(HTTPStatusCode.INTERNAL_SERVER_ERROR.getStatusCode());
+                response.setOk(false);
+                return;
+            }
+
+            JSONArray testResultsArray = new JSONArray();
+            if (testRepetitions == 0) {
+                testRepetitions = 1;
+            }
             for (int i = 0; i < testRepetitions; i++) {
-                String newFileName = chunked ? fileName.replace("chunked.txt", "chunked_" + i + ".txt") : fileName.replace("full.txt", "full_" + i + ".txt");
-                FileWriterTest fileWriterTest = new FileWriterTest(100_000, chunked, chunkSize,
+                String newFileName = chunked
+                        ? fileName.replace("chunked.txt", "chunked_" + startIndex + ".txt")
+                        : fileName.replace("full.txt", "full_" + startIndex + ".txt");
+                FileWriterTest fileWriterTest = new FileWriterTest(numberOfItems, chunked, chunkSize,
                         tmpDir.resolve(newFileName),
-                        testSessionId);
+                        testSessionId, dataType);
 
                 System.out.println("Running: " + fileWriterTest.getName());
 
@@ -95,6 +126,7 @@ public class TestRunnerAPI {
                 if (result == null) {
                     return;
                 }
+
                 JSONObject testResultObject = new JSONObject();
                 testResultObject.put("testName", result.getTestName());
                 testResultObject.put("durationInMillis", result.getDurationMillis());
@@ -102,28 +134,19 @@ public class TestRunnerAPI {
                 testResultObject.put("memoryUsed", result.getMetrics().get("memoryUsedBytes"));
                 testResultObject.put("testIndex", i);
                 testResultsArray.put(testResultObject);
-            }
-        } else {
-            FileWriterTest fileWriterTest = new FileWriterTest(100_000, chunked, chunkSize, tmpDir.resolve(fileName),
-                    testSessionId);
 
-            System.out.println("Running: " + fileWriterTest.getName());
-
-            PerformanceResult result = fileWriterTest.runTest(resourceMonitor);
-            if (result == null) {
-                return;
+                startIndex += 1;
             }
-            JSONObject testResultObject = new JSONObject();
-            testResultObject.put("testName", result.getTestName());
-            testResultObject.put("durationInMillis", result.getDurationMillis());
-            testResultObject.put("fileSize", result.getMetrics().get("fileSizeBytes"));
-            testResultObject.put("memoryUsed", result.getMetrics().get("memoryUsedBytes"));
-            testResultObject.put("testIndex", 0);
-            testResultsArray.put(testResultObject);
+            responseObject.put("result", testResultsArray);
+            HeaderHelper.createJsonResponse(responseObject.toString(), response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+
+            HeaderHelper.createJsonResponse("{\"message\":\"Please check the payload\"}", response);
+            response.setStatusCode(HTTPStatusCode.BAD_REQUEST.getStatusCode());
+            response.setOk(false);
+            return;
         }
-
-        responseObject.put("result", testResultsArray);
-        HeaderHelper.createJsonResponse(responseObject.toString(), response);
     }
 
     @HTTPPath(path = "/api/tests/readFromFile")
@@ -132,9 +155,14 @@ public class TestRunnerAPI {
         JSONObject requestObject = new JSONObject(requestBodyString);
         JSONObject responseObject = new JSONObject();
 
-        Path tmpDir = Paths.get("output");
+        String defaultDirectory = ConfigDao.getDefaultDirectory();
+        Path tmpDir = Paths.get(defaultDirectory.isBlank() ? "output" : defaultDirectory);
         if (!Files.exists(tmpDir)) {
-            Files.createDirectories(tmpDir);
+            responseObject.put("message", "No default directory for test files");
+            HeaderHelper.createJsonResponse(responseObject.toString(), response);
+            response.setStatusCode(HTTPStatusCode.NOT_FOUND.getStatusCode());
+            response.setOk(false);
+            return;
         }
 
         File[] files = new File(tmpDir.getFileName().toFile().getAbsolutePath()).listFiles();

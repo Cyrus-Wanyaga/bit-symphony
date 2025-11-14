@@ -5,14 +5,14 @@ import java.util.Date;
 public class TestSession {
     private int id;
     private String testGroup;
-    private Date createdAt;
+    private String createdAt;
     private int totalRuns;
     private String description;
 
     public TestSession() {
     }
 
-    public TestSession(String testGroup, Date createdAt, int totalRuns, String description) {        
+    public TestSession(String testGroup, String createdAt, int totalRuns, String description) {        
         this.testGroup = testGroup;
         this.totalRuns = totalRuns;
         this.description = description;
@@ -34,11 +34,11 @@ public class TestSession {
         this.testGroup = testGroup;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 

@@ -46,4 +46,40 @@ public class ConfigDao {
 
         return false;
     }
+
+    public static String getDefaultDirectory() {
+        String SELECT_QUERY = "SELECT value from app_config WHERE key = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(SELECT_QUERY)) {
+            stmt.setString(1, "default_directory");
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                return rs.getString(1);
+            } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public static String getDirectoryMaxSize() {
+        String SELECT_QUERY = "SELECT value from app_config WHERE key = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(SELECT_QUERY)) {
+            stmt.setString(1, "directory_max_size");
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                return rs.getString(1);
+            } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
 }
