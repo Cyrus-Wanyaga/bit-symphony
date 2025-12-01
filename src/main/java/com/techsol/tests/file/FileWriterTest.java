@@ -86,7 +86,7 @@ public class FileWriterTest implements PerformanceTest {
             } else {
                 for (int i = 0; i < numberOfItems; i++) {
                     if (dataType.equals("text")) {
-                        writer.write(words.get(rand.nextInt(words.size())));
+                        writer.write(words.get(rand.nextInt(words.size())) + "\n");
                     } else {
                         writer.write(rand.nextInt(1_000_000) + "\n");
                     }
@@ -114,6 +114,7 @@ public class FileWriterTest implements PerformanceTest {
             return null;
         }
 
+        System.out.println("Generated test file with id: " + testFileId);
         TestResult testResult = new TestResult();
         testResult.setTestName(getName());
         testResult.setAlgorithmName("File I/O Ops");

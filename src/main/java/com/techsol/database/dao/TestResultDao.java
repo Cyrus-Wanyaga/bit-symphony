@@ -12,7 +12,7 @@ import com.techsol.models.TestResult;
 public class TestResultDao {
     public static boolean createTestResult(TestResult testResult) {
         String INSERT_QUERY = "INSERT INTO test_result (test_name, algorithm_name, start_time, end_time," +
-                "duration_ms, cpu_usage, memory_usage, disk_io, extra_info, session_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "duration_ms, cpu_usage, memory_usage, disk_io, extra_info, session_id, test_file_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement stmt = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setString(1, testResult.getTestName());
@@ -25,6 +25,7 @@ public class TestResultDao {
                     stmt.setDouble(8, testResult.getDiskIO());
                     stmt.setString(9, testResult.getExtraInfo());
                     stmt.setInt(10, testResult.getSessionId());
+                    stmt.setInt(11, testResult.getFileId());
 
                     stmt.executeUpdate();
 
