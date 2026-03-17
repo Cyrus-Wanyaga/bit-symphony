@@ -6,10 +6,9 @@
         {% include "../sidebar/sidebar.peb" %}
     </div>
     <div class="content">
-
         <div class="search-header">
             <div class="search-content">
-                <p class="">Search</p>
+                <input type="text" placeholder="Search">
                 <i class="bi bi-search"></i>
             </div>
         </div>
@@ -18,37 +17,18 @@
             {% if requestPath == "/dashboard" %}
             <h4>Dashboard</h4>
             <div class="top-dashboard-section">
-                <div class="quick-stats">
+                <div class="quick-stats" x-data="dashboardAnalytics()" x-init="init()" x-cloack>
                     <h6>Quick Stats</h6>
                     <div class="analytics-card-containers">
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Cases</p>
-                            <p class="analytics-card-content">86</p>
-                        </div>
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Files</p>
-                            <p class="analytics-card-content">15</p>
-                        </div>
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Files Size</p>
-                            <p class="analytics-card-content">150 MB</p>
-                        </div>
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Total Test Time</p>
-                            <p class="analytics-card-content">1300 min</p>
-                        </div>
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Average Test Time</p>
-                            <p class="analytics-card-content">50 sec</p>
-                        </div>
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Longest Test Time</p>
-                            <p class="analytics-card-content">300 sec</p>
-                        </div>
-                        <div class="analytics-card">
-                            <p class="analytics-card-title">Shortest Test Time</p>
-                            <p class="analytics-card-content">100 m.sec</p>
-                        </div>
+                        <template x-for="card in cards" :key="card.key">
+                            <div class="analytics-card" x-show="loaded" x-transition.opacity.duration.600ms
+                                x-transition.scale.duration.600ms>
+                                <p class="analytics-card-title" x-text="card.label"></p>
+                                <p class="analytics-card-content">
+                                    <span x-text="card.displayValue"></span>
+                                </p>
+                            </div>
+                        </template>
                     </div>
                 </div>
                 <div class="top-tests">
@@ -67,6 +47,31 @@
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-charts-section">
+                <h6>Analytics</h6>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <p class="chart-title">Test Files Generated (Daily)</p>
+                        <canvas id="testFilesDailyChart"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <p class="chart-title">Test Cases Executed (Daily)</p>
+                        <canvas id="testCasesDailyChart"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <p class="chart-title">Test Categorization</p>
+                        <canvas id="testCategoryPieChart"></canvas>
+                    </div>
+
+                    <div class="chart-card chart-wide">
+                        <p class="chart-title">Execution Time vs CPU / Memory Usage</p>
+                        <canvas id="executionCorrelationChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -93,20 +98,200 @@
 
     getOSDetails();
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function dashboardAnalytics() {
+        return {
+            loaded: false,
+            cards: [
+                { key: 'totalTestCases', label: 'Total Test Cases', value: 0, displayValue: '—' },
+                { key: 'totalTestFiles', label: 'Total Test Files', value: 0, displayValue: '—' },
+                { key: 'totalTestFileSize', label: 'Total Test Files Size', value: 0, displayValue: '— MB' },
+                { key: 'totalTestTime', label: 'Total Test Time', value: 0, displayValue: '— min' },
+                { key: 'averageTestTime', label: 'Average Test Time', value: 0, displayValue: '— sec' },
+                { key: 'longestTestTime', label: 'Longest Test Time', value: 0, displayValue: '— sec' },
+                { key: 'shortestTestTime', label: 'Shortest Test Time', value: 0, displayValue: '— ms' }
+            ],
+
+            async init() {
+                // Let DOM paint first (cards visible)
+                await new Promise(r => setTimeout(r, 150));
+
+                fetch('/api/tests/dashboardAnalytics')
+                    .then(res => res.json())
+                    .then(data => {
+                        const analytics = data.dashboardAnalytics;
+                        this.applyData(analytics);
+                        this.loaded = true;
+                    })
+                    .catch(err => console.error(err));
+            },
+
+            applyData(data) {
+                this.updateCard('totalTestCases', data.totalTestCases);
+                this.updateCard('totalTestFiles', data.totalTestFiles);
+                this.updateCard('totalTestFileSize', data.totalTestFileSize, ' MB');
+                this.updateCard('totalTestTime', data.totalTestTime, ' min');
+                this.updateCard('averageTestTime', data.averageTestTime, ' sec');
+                this.updateCard('longestTestTime', data.longestTestTime, ' sec');
+                this.updateCard('shortestTestTime', data.shortestTestTime, ' ms');
+            },
+
+            updateCard(key, value, suffix = '') {
+                const card = this.cards.find(c => c.key === key);
+                if (!card) return;
+
+                this.animateNumber(card, value, suffix);
+            },
+
+            animateNumber(card, target, suffix) {
+                let start = 0;
+                const duration = 600;
+                const startTime = performance.now();
+
+                const step = (now) => {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const current = Math.floor(progress * target);
+
+                    card.displayValue = current + suffix;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        card.displayValue = target + suffix;
+                    }
+                };
+
+                requestAnimationFrame(step);
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
         const analyticsSection = document.querySelector('.analytics-card-containers');
         const topTestsSection = document.querySelector('.top-tests-card-section');
 
-        function setTopTestsHeight() {
-            if (analyticsSection && topTestsSection) {
-                const analyticsHeight = analyticsSection.offsetHeight;
-                topTestsSection.style.height = (analyticsHeight + 0) + 'px';
-            }
-        }
+        if (!analyticsSection || !topTestsSection) return;
 
-        // Initial set and resize listener
-        setTopTestsHeight();
-        window.addEventListener('resize', setTopTestsHeight);
+        const observer = new ResizeObserver(() => {
+            topTestsSection.style.height = analyticsSection.offsetHeight + 'px';
+        });
+
+        observer.observe(analyticsSection);
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCharts();
+    });
+
+    async function loadCharts() {
+        await Promise.all([
+            loadTestFilesDailyChart(),
+            loadTestCasesDailyChart(),
+            loadCategoryPieChart(),
+            loadCorrelationChart()
+        ]);
+    }
+
+    async function loadTestFilesDailyChart() {
+        // const res = await fetch('/api/tests/files/daily');
+        const data = [
+            { "date": "2026-01-20", "count": 12 },
+            { "date": "2026-01-21", "count": 9 },
+            { "date": "2026-01-22", "count": 15 },
+            { "date": "2026-01-23", "count": 20 },
+            { "date": "2026-01-24", "count": 2 },
+            { "date": "2026-01-25", "count": 1 }
+        ];
+
+        new Chart(document.getElementById('testFilesDailyChart'), {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Files',
+                    data: data.map(d => d.count),
+                    tension: 0.4
+                }]
+            }
+        });
+    }
+
+    async function loadTestCasesDailyChart() {
+        // const res = await fetch('/api/tests/cases/daily');
+        const data = [
+            { "date": "2026-01-20", "count": 34 },
+            { "date": "2026-01-21", "count": 41 }
+        ];
+
+        new Chart(document.getElementById('testCasesDailyChart'), {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Test Cases',
+                    data: data.map(d => d.count)
+                }]
+            }
+        });
+    }
+
+    async function loadCategoryPieChart() {
+        // const res = await fetch('/api/tests/categories');
+        const data = [
+            { "category": "Regression", "count": 20 },
+            { "category": "Smoke", "count": 12 },
+            { "category": "Performance", "count": 7 }
+        ];
+
+        new Chart(document.getElementById('testCategoryPieChart'), {
+            type: 'pie',
+            data: {
+                labels: data.map(d => d.category),
+                datasets: [{
+                    data: data.map(d => d.count)
+                }]
+            }
+        });
+    }
+
+    async function loadCorrelationChart() {
+        // const res = await fetch('/api/tests/execution/correlation');
+        const data = [
+            { "executionTime": 120, "cpuUsage": 35, "memoryUsage": 512 },
+            { "executionTime": 300, "cpuUsage": 70, "memoryUsage": 1024 }
+        ];
+
+        new Chart(document.getElementById('executionCorrelationChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'CPU Usage',
+                        data: data.map(d => ({
+                            x: d.executionTime,
+                            y: d.cpuUsage
+                        }))
+                    },
+                    {
+                        label: 'Memory Usage',
+                        data: data.map(d => ({
+                            x: d.executionTime,
+                            y: d.memoryUsage
+                        }))
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Execution Time (sec)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Usage' }
+                    }
+                }
+            }
+        });
+    }
+
 </script>
 {% endblock %}

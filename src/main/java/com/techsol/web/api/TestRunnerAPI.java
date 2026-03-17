@@ -1,17 +1,21 @@
 package com.techsol.web.api;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneOffset;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.techsol.database.dao.ConfigDao;
+import com.techsol.database.dao.DashboardAnalyticsDao;
 import com.techsol.database.dao.TestSessionDao;
+import com.techsol.models.DashboardAnalytics;
 import com.techsol.models.TestSession;
 import com.techsol.tests.PerformanceResult;
 import com.techsol.tests.TestResourceMonitor;
@@ -43,12 +47,18 @@ public class TestRunnerAPI {
     }
 
     @HTTPPath(path = "/api/tests/getTestFiles")
-    public void getTestFiles(HTTPRequest request, HTTPResponse response) {
+    public void getTestFiles(HTTPRequest request, HTTPResponse response) throws IOException {
         JSONObject responseObject = new JSONObject();
         JSONArray fileJsonArray = new JSONArray();
         File[] files = new File("output").listFiles();
         for (File file : files) {
-            fileJsonArray.put(file.getAbsolutePath());
+            JSONObject fileDataJsonObject = new JSONObject();
+            fileDataJsonObject.put("fileName", file.getName());
+            fileDataJsonObject.put("filePath", file.getAbsolutePath());
+            fileDataJsonObject.put("fileSize", Files.size(file.toPath()));
+            fileDataJsonObject.put("fileOwner", Files.getOwner(file.toPath()));
+            fileDataJsonObject.put("lastModifiedTime", Files.getLastModifiedTime(file.toPath()).toInstant().atOffset(ZoneOffset.UTC));
+            fileJsonArray.put(fileDataJsonObject);
         }
         responseObject.put("result", fileJsonArray);
         HeaderHelper.createJsonResponse(responseObject.toString(), response);
@@ -112,6 +122,7 @@ public class TestRunnerAPI {
             if (testRepetitions == 0) {
                 testRepetitions = 1;
             }
+
             for (int i = 0; i < testRepetitions; i++) {
                 String newFileName = chunked
                         ? fileName.replace("chunked.txt", "chunked_" + startIndex + ".txt")
@@ -228,4 +239,12 @@ public class TestRunnerAPI {
         HeaderHelper.createJsonResponse(responseObject.toString(), response);
     }
 
+    @HTTPPath(path = "/api/tests/dashboardAnalytics")
+    public void getDashboardAnalytics(HTTPRequest request, HTTPResponse response) throws Exception {
+        JSONObject responseObject = new JSONObject();
+        DashboardAnalytics dashboardAnalytics = DashboardAnalyticsDao.getDashboardAnalytics();
+        System.out.println("Dashboard Analytics: " + dashboardAnalytics.toString());
+        responseObject.put("dashboardAnalytics", new JSONObject(dashboardAnalytics));
+        HeaderHelper.createJsonResponse(responseObject.toString(), response);
+    }
 }
