@@ -3,108 +3,71 @@
     <!-- <i class="bi bi-arrow-left-right"></i> -->
 </div>
 <div class="separator"></div>
-<div class="side-nav-links" 
-     x-data="{ 
-        activeTab: localStorage.getItem('activeTab') || '/dashboard',
-        openTabs: JSON.parse(localStorage.getItem('openTabs')) || {}  
-     }"
-     x-init="
-        Object.keys(openTabs).forEach(tab => {
-            if (openTabs[tab] && $refs[tab + 'Caret']) {
-                $animateCaret($refs[tab + 'Caret'], true);
-            } else if (openTabs[tab] && tab === 'test-cases') {
-                $animateCaret($refs.testCasesCaret, true);
-            }
-        });
-     ">
+<div class="side-nav-links" x-data="sidebar()">
     <ul>
-        <!-- Dashboard -->
         <li class="side-nav-link" :class="{ 'active': activeTab === '/dashboard' }">
-            <a href="/dashboard" 
-               @click="activeTab = '/dashboard'; localStorage.setItem('activeTab', '/dashboard')">
-                Dashboard
-            </a>
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-house"></i>
+                <a href="/dashboard" class="mx-3">Dashboard</a>
+            </div>
         </li>
 
-        <!-- Test Cases -->
-        <li class="side-nav-link"
-            :class="{ 'active': activeTab === '/test-cases' }">
+        <li class="side-nav-link" :class="{ 'active': activeTab === '/codingtool' }">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-code"></i>
+                <a href="/codingtool" class="mx-3">Coding Tool</a>
+            </div>
+        </li>
+
+        <li class="side-nav-link" :class="{ 'active': activeTab === '/test-cases' }">
             <div class="side-nav-link-parent"
-                 @click="openTabs['test-cases'] = !openTabs['test-cases']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.testCasesCaret, openTabs['test-cases'])">
-                <p>Test Cases</p>
+                @click="toggleGroup('test-cases'); $animateCaret($refs.testCasesCaret, openTabs['test-cases'])">
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-file"></i>
+                    <p class="mx-3">Test Cases</p>
+                </div>
                 <i class="bi bi-chevron-right" x-ref="testCasesCaret"></i>
             </div>
-            <div class="side-nav-child-links" x-show="openTabs['test-cases']" x-collapse>
-                <a href="/test-cases-data"
-                   @click="activeTab = '/test-cases'; localStorage.setItem('activeTab', '/test-cases')">
-                   Test Case Data
-                </a>
-                <a href="/test-cases-files"
-                   @click="activeTab = '/test-cases'; localStorage.setItem('activeTab', '/test-cases')">
-                   Test Case Files
+            <div class="side-nav-child-links" x-show="openTabs['test-cases']" x-collapse x-cloak>
+                <a href="/test-cases-files" :class="{ 'fw-bold': currentPath === '/test-cases-files' }">
+                    Test Case Files
                 </a>
             </div>
         </li>
 
-        <!-- Tutorials -->
-        <li class="side-nav-link">
+        <li class="side-nav-link" :class="{ 'active': activeTab === '/tutorials' }">
             <div class="side-nav-link-parent"
-                 @click="openTabs['tutorials'] = !openTabs['tutorials']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.tutorialsCaret, openTabs['tutorials'])">
-                <p>Tutorials</p>
+                @click="toggleGroup('tutorials'); $animateCaret($refs.tutorialsCaret, openTabs['tutorials'])">
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-book"></i>
+                    <p class="mx-3">Tutorials</p>
+                </div>
                 <i class="bi bi-chevron-right" x-ref="tutorialsCaret"></i>
             </div>
-            <div class="side-nav-child-links" x-show="openTabs['tutorials']" x-collapse>
-                <a href="/tutorials/server-io"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Server I/O
-                </a>
-                <a href="/tutorials/file-io"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   File I/O
-                </a>
-                <a href="/tutorials/data-structures"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Data Structures
-                </a>
-                <a href="/tutorials/algorithms"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Algorithms
-                </a>
-                <a href="/tutorials/java-code"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Java Code
-                </a>
-                <a href="/tutorials/backend-engineering"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Backend Engineering
-                </a>
-                <a href="/tutorials/frontend-engineering"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Frontend Engineering
-                </a>
-                <a href="/tutorials/proompt-engineering"
-                   @click="activeTab = '/tutorials'; localStorage.setItem('activeTab', '/tutorials')">
-                   Proompt Engineering
-                </a>
+            <div class="side-nav-child-links" x-show="openTabs['tutorials']" x-collapse x-cloak>
+                <a href="/tutorials/server-io" :class="{ 'fw-bold': currentPath.includes('/server-io') }">Server I/O</a>
+                <a href="/tutorials/file-io" :class="{ 'fw-bold': currentPath.includes('/file-io') }">File I/O</a>
+                <a href="/tutorials/data-structures" :class="{ 'fw-bold': currentPath.includes('/data-structures') }">Data Structures</a>
+                <a href="/tutorials/algorithms" :class="{ 'fw-bold': currentPath.includes('/algorithms') }">Algorithms</a>
+                <a href="/tutorials/java-code" :class="{ 'fw-bold': currentPath.includes('/java-code') }">Java Code</a>
+                <a href="/tutorials/backend-engineering" :class="{ 'fw-bold': currentPath.includes('/backend-engineering') }">Backend Engineering</a>
+                <a href="/tutorials/frontend-engineering" :class="{ 'fw-bold': currentPath.includes('/frontend-engineering') }">Frontend Engineering</a>
+                <a href="/tutorials/proompt-engineering" :class="{ 'fw-bold': currentPath.includes('/proompt-engineering') }">Prompt Engineering</a>
             </div>
         </li>
 
-        <!-- Configuration -->
-        <li class="side-nav-link">
+        <li class="side-nav-link" :class="{ 'active': activeTab === '/configuration' }">
             <div class="side-nav-link-parent"
-                 @click="openTabs['configuration'] = !openTabs['configuration']; localStorage.setItem('openTabs', JSON.stringify(openTabs)); $animateCaret($refs.configurationCaret, openTabs['configuration'])">
-                <p>Configuration</p>
+                @click="toggleGroup('configuration'); $animateCaret($refs.configurationCaret, openTabs['configuration'])">
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-gear"></i>
+                    <p class="mx-3">Configuration</p>
+                </div>
                 <i class="bi bi-chevron-right" x-ref="configurationCaret"></i>
             </div>
-            <div class="side-nav-child-links" x-show="openTabs['configuration']" x-collapse>
-                <a href="/configuration/app-settings"
-                   @click="activeTab = '/configuration'; localStorage.setItem('activeTab', '/configuration')">
-                   App Settings
-                </a>
-                <a href="/configuration/site-settings"
-                   @click="activeTab = '/configuration'; localStorage.setItem('activeTab', '/configuration')">
-                   Site Settings
-                </a>
+            <div class="side-nav-child-links" x-show="openTabs['configuration']" x-collapse x-cloak>
+                <a href="/configuration/app-settings" :class="{ 'fw-bold': currentPath.includes('/app-settings') }">App Settings</a>
+                <a href="/configuration/site-settings" :class="{ 'fw-bold': currentPath.includes('/site-settings') }">Site Settings</a>
             </div>
         </li>
     </ul>
@@ -112,13 +75,68 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
+        // 1. Animation Helper (unchanged)
         Alpine.magic('animateCaret', () => (el, isOpen) => {
+            if (!el) return;
             anime({
                 targets: el,
-                rotate: isOpen ? 90 : 0,  // Rotate to 180 when open, back to 0 when closed
+                rotate: isOpen ? 90 : 0,
                 duration: 300,
                 easing: 'easeInOutQuad'
             });
         });
+
+        // 2. The Sidebar Logic
+        Alpine.data('sidebar', () => ({
+            activeTab: '',     // Controls which main group is highlighted
+            openTabs: {},      // Controls which accordion is expanded
+            currentPath: window.location.pathname, // Helper for child link highlighting
+
+            init() {
+                // Determine active state based on URL
+                const path = window.location.pathname;
+                
+                // Split the URL: "/tutorials/server-io" -> ["", "tutorials", "server-io"]
+                const segments = path.split('/');
+                const rootSegment = segments[1]; // "dashboard", "tutorials", etc.
+
+                // Logic to set active tab and open accordion
+                if (rootSegment === 'dashboard') {
+                    this.activeTab = '/dashboard';
+                } 
+                else if (rootSegment === 'codingtool') {
+                    this.activeTab = '/codingtool';
+                } 
+                // Handle "Test Cases" (Url might be /test-cases-files, which maps to 'test-cases' group)
+                else if (rootSegment.startsWith('test-cases')) {
+                    this.activeTab = '/test-cases';
+                    this.openTabs['test-cases'] = true;
+                } 
+                else if (rootSegment === 'tutorials') {
+                    this.activeTab = '/tutorials';
+                    this.openTabs['tutorials'] = true;
+                } 
+                else if (rootSegment === 'configuration') {
+                    this.activeTab = '/configuration';
+                    this.openTabs['configuration'] = true;
+                }
+
+                // Handle Initial Caret Animation
+                this.$nextTick(() => {
+                    if (this.openTabs['test-cases']) this.$animateCaret(this.$refs.testCasesCaret, true);
+                    if (this.openTabs['tutorials']) this.$animateCaret(this.$refs.tutorialsCaret, true);
+                    if (this.openTabs['configuration']) this.$animateCaret(this.$refs.configurationCaret, true);
+                });
+            },
+
+            toggleGroup(group) {
+                // Close others (Accordion behavior)
+                Object.keys(this.openTabs).forEach(k => {
+                    if (k !== group) this.openTabs[k] = false;
+                });
+                // Toggle clicked
+                this.openTabs[group] = !this.openTabs[group];
+            }
+        }));
     });
 </script>
