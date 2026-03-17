@@ -4,7 +4,7 @@
     --primary-color: #fa807c;
     --primary-color-hex: 250, 128, 124;
     --secondary-color: #02ae8e;
-    --secondary-color-hex: 2,174,142;
+    --secondary-color-hex: 2, 174, 142;
     --accent-color: #dcf513;
     --text-color: #ffe4e4;
 }
@@ -365,7 +365,8 @@ button {
     background-color: white;
 }
 
-.search-header, .search-content {
+.search-header,
+.search-content {
     display: flex;
 }
 
@@ -374,6 +375,18 @@ button {
     align-items: center;
     padding-left: 32px;
     padding-right: 32px;
+}
+
+.search-header input {
+    background: transparent;
+    border: none;
+    width: 100%;
+    color: white;
+}
+
+.search-header input:focus {
+    outline: none;
+    border-bottom: 1px solid white;
 }
 
 .search-content {
@@ -431,8 +444,9 @@ button {
     margin-bottom: -32px;
 }
 
-.quick-stats h6, .top-tests h6 {
-    padding: 16px 0; 
+.quick-stats h6,
+.top-tests h6 {
+    padding: 16px 0;
 }
 
 .top-tests h6 {
@@ -441,7 +455,7 @@ button {
 
 .analytics-card-containers {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
     align-items: stretch;
 }
@@ -492,7 +506,8 @@ button {
     align-items: center;
 }
 
-.count-bg, .action-bg {
+.count-bg,
+.action-bg {
     width: 32px;
     height: 32px;
     background-color: #98dc8b;
@@ -519,4 +534,80 @@ button {
 
 .top-test-card-title {
     margin-left: 16px;
+}
+
+.dashboard-charts-section {
+    margin-top: 16px;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.chart-card {
+    background: #fff;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.chart-wide {
+    grid-column: span 3;
+}
+
+.chart-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #333;
+}
+
+.card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    display: grid;
+    margin: 16px 0;
+}
+
+.test-files-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+    background-color: white;
+    border-radius: 5px;
+    padding: 16px;
+    margin: 16px 0;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.test-files-pagination-container button {
+    margin-top: unset !important;
+    padding: 0 32px;
+}
+
+.test-files-pagination-container .pagination {
+    display: flex;
+    align-items: center;
+}
+
+.pagination-items-per-page {
+
+}
+
+.pagination-items-per-page p {
+    font-size: 14px;
+}
+
+.pagination-items-per-page select {
+    font-size: 14px;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #707FDD;
+    margin-top: 8px;
+    border-radius: 5px;
 }
