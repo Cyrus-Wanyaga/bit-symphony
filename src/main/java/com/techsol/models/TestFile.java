@@ -10,16 +10,16 @@ public class TestFile {
     private long fileSizeInBytes;
     private long numberOfItems;
     private String dataType;
-    private Date createdAt;
-    private Date updatedAt;
+    private String createdAt;
+    private String updatedAt;
 
     public TestFile() {
     }
 
     public TestFile(String fileName, String filePath, int fileExists, long fileSizeInBytes, long numberOfItems,
             String dataType,
-            Date createdAt,
-            Date updatedAt) {
+            String createdAt,
+            String updatedAt) {
         this.fileName = fileName;
         this.filePath = filePath;
         this.fileExists = fileExists;
@@ -86,19 +86,19 @@ public class TestFile {
         this.dataType = dataType;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 

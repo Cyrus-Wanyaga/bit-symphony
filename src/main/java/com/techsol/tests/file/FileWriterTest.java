@@ -4,8 +4,10 @@ import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,9 +107,9 @@ public class FileWriterTest implements PerformanceTest {
         testFile.setFileSizeInBytes(Files.size(outputFile));
         testFile.setNumberOfItems(numberOfItems);
         testFile.setDataType(dataType);
-        testFile.setCreatedAt(new Date());
-        testFile.setUpdatedAt(new Date());
-
+        testFile.setCreatedAt(OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        testFile.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        
         int testFileId = TestFileDao.saveTestFile(testFile);
         if (testFileId <= 0) {
             System.out.println("Failed to save test file generation data");

@@ -2,4 +2,162 @@
 
 {% block dashboardcontent %}
 <h3>Test Case Files</h3>
+
+<div x-data="testCaseLoader()" class="file-container">
+
+    <div x-show="isLoading" style="padding: 20px; text-align: center;">
+        <span>Loading files...</span>
+    </div>
+
+    <div x-show="error" style="color: red; padding: 20px; display: none;" x-show.important="error">
+        <strong x-text="error"></strong>
+        <button @click="fetchFiles()">Retry</button>
+    </div>
+
+    <div x-show="!isLoading && !error">
+        <div class="test-files-pagination-container">
+            <span>Showing <span x-text="paginatedFiles.length"></span> of <span x-text="files.length"></span>
+                files</span>
+
+            <div class="d-flex align-items-start">
+                <div style="" class="pagination">
+                    <button @click="prevPage()" :disabled="currentPage === 1">Previous</button>
+                    <span style="">Page <span x-text="currentPage"></span> / <span x-text="totalPages"></span></span>
+                    <button @click="nextPage()" :disabled="currentPage >= totalPages">Next</button>
+                </div>
+
+                <div class="pagination-items-per-page">
+                    <p>Items Per Page</p>
+                    <select x-model.number="itemsPerPage" @change="currentPage = 1">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <template x-for="file in paginatedFiles" :key="">
+                <div class="card" style="padding: 10px; box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+                    <div class="" style="background-color: salmon; padding: 10px; border-radius: 5px;">
+                        <div class="d-flex align-items-center w-100">
+                            <i class="bi bi-file-earmark" style="color: #3d4ba0;"></i>
+                            <h6 x-text="file.fileName" style="margin-top: 0; margin-left: 0.5rem; color: #3d4ba0;"
+                                class="">
+                            </h6>
+                        </div>
+                        <hr />
+                        <div class="d-flex flex-column justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-hard-drive" style="color: #fff;"></i>
+                                <p x-text="`File Size: ${convertBytesToKB(file.fileSize)}`"
+                                    style="color: #fff; font-size: 0.9em; margin-left: 0.5rem;">
+                                </p>
+                            </div>
+                            <div class="d-flex align-items-center my-3">
+                                <i class="fa-solid fa-clock" style="color: #fff;"></i>
+                                <p x-text="`Last Modified: ${formatTime(file.lastModifiedTime)}`"
+                                    style="color: #fff; font-size: 0.9em; margin-left: 0.5rem;"></p>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-user" style="color: #fff;"></i>
+                                <p x-text="`File Owner: ${file.fileOwner}`"
+                                    style="color: #fff; font-size: 0.9em; margin-left: 0.5rem;"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="d-flex align-items-center justify-content-between">
+                        <button class="btn btn-primary mt-0">View</button>
+                        <button class="btn btn-danger mt-0">Delete</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div x-show="files.length === 0" style="grid-column: 1 / -1; text-align: center; color: #888;">
+            No test case files found.
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('testCaseLoader', () => ({
+            files: [],
+            isLoading: true,
+            error: null,
+
+            currentPage: 1,
+            itemsPerPage: 40,
+
+            // Automatically called when component initializes
+            init() {
+                this.fetchFiles();
+            },
+
+            async fetchFiles() {
+                this.isLoading = true;
+                this.error = null;
+
+                try {
+                    // REPLACE THIS URL with your actual API endpoint
+                    const response = await fetch('/api/tests/getTestFiles');
+
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log(result);
+                    this.files = result.result;
+                } catch (err) {
+                    console.error(err);
+                    this.error = 'Failed to load test cases. Please try again.';
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            formatName(filename) {
+                if (!filename) return '';
+                // 1. Remove extension
+                let name = filename.substring(filename.lastIndexOf('/') + 1, filename.length) || filename;
+                // 2. Replace separators with spaces
+                return name.replace(/[_]/g, ' ');
+            },
+
+            get paginatedFiles() {
+                const start = (this.currentPage - 1) * this.itemsPerPage;
+                const end = start + this.itemsPerPage;
+                return this.files.slice(start, end);
+            },
+
+            get totalPages() {
+                return Math.ceil(this.files.length / this.itemsPerPage) || 1;
+            },
+
+            nextPage() {
+                if (this.currentPage < this.totalPages) this.currentPage++;
+            },
+
+            prevPage() {
+                if (this.currentPage > 1) this.currentPage--;
+            },
+
+            convertBytesToKB(bytes) {
+                return (bytes / (1024)).toFixed(2) + " KB";
+            },
+
+            formatTime(time) {
+                const date = new Date(time);
+                return date.toLocaleString();
+            }
+        }));
+    });
+</script>
 {% endblock %}

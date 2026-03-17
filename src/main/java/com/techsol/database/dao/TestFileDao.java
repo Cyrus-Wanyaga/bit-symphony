@@ -22,8 +22,8 @@ public class TestFileDao {
             stmt.setLong(4, testFile.getFileSizeInBytes());
             stmt.setLong(5, testFile.getNumberOfItems());
             stmt.setString(6, testFile.getDataType());
-            stmt.setString(7, testFile.getCreatedAt().toString());
-            stmt.setString(8, testFile.getUpdatedAt().toString());
+            stmt.setString(7, testFile.getCreatedAt());
+            stmt.setString(8, testFile.getUpdatedAt());
 
             stmt.executeUpdate();
 
